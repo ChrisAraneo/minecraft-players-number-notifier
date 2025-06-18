@@ -1,6 +1,6 @@
 {
   "name": "minecraft-players-number-notifier",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Script that checks number of players on Minecraft server and notifies the admin",
   "keywords": [
     "minecraft",
@@ -23,7 +23,7 @@
   "scripts": {
     "build": "tsc --build tsconfig.json && node scripts/copy-config",
     "chores": "npm run lint && npm run format",
-    "format": "node scripts/format",
+    "format": "sort-package-json && prettier --write \"**/*.{js,mjs,ts,json}\"",
     "lint": "node scripts/lint",
     "start": "npm run build && node dist/src/index.js",
     "test": "jest",
