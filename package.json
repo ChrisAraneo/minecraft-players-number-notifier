@@ -24,7 +24,7 @@
     "build": "tsc --build tsconfig.json && node scripts/copy-config",
     "chores": "npm run lint && npm run format",
     "format": "sort-package-json && prettier --write \"**/*.{js,mjs,ts,json}\"",
-    "lint": "node scripts/lint",
+    "lint": "eslint --fix",
     "start": "npm run build && node dist/src/index.js",
     "test": "jest",
     "typecheck": "tsc"
@@ -41,7 +41,7 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
-    "@chris.araneo/eslint-config": "^0.0.45",
+    "@chris.araneo/eslint-config": "0.0.47",
     "@types/dashify": "^1.0.3",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
