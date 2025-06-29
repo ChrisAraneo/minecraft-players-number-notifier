@@ -10,6 +10,7 @@ export default [
       'package.json',
       'node_modules/**',
       'dist/**',
+      'eslint.config.js',
     ],
   }),
 ];
