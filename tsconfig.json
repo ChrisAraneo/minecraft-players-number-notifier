@@ -34,5 +34,6 @@
     "strict": true,
     "target": "es2022",
     "types": ["node", "jest"]
-  }
+  },
+  "include": ["src/**/*.ts", "scripts/*.js"],
 }
