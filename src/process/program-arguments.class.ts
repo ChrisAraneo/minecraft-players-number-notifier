@@ -10,7 +10,7 @@ import {
 export class ProgramArguments {
   private arguments?: string[];
 
-  constructor(private process: Process) {
+  constructor(private readonly process: Process) {
     this.initialize();
   }
 
@@ -22,25 +22,24 @@ export class ProgramArguments {
         const key: string = parts[0];
 
         if (!this.isArgumentKeyValid(key)) {
-          throw Error(INCORRECT_ARGUMENT_KEY_ERROR_MESSAGE);
+          throw new Error(INCORRECT_ARGUMENT_KEY_ERROR_MESSAGE);
         }
 
         const valueParts = parts[1].split(';');
 
         return {
-          key: key,
+          key,
           value: valueParts.length > 1 ? valueParts : valueParts[0],
         };
-      } else {
-        throw Error(INCORRECT_ARGUMENT_VALUE_ERROR_MESSAGE);
       }
+      throw new Error(INCORRECT_ARGUMENT_VALUE_ERROR_MESSAGE);
     });
   }
 
   private initialize(): void {
     if (!this.arguments) {
-      const argv = this.process.argv;
-      const length = argv.length;
+      const { argv } = this.process;
+      const { length } = argv;
 
       this.arguments = argv.slice(2, length);
     }
