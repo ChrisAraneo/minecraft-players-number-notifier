@@ -13,4 +13,10 @@ export default [
       'eslint.config.js',
     ],
   }),
+  {
+    files: ['**/*.ts'],
+    rules: {
+      '@typescript-eslint/max-params': 'off',
+    },
+  },
 ];
