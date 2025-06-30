@@ -1,10 +1,11 @@
+import Path from 'node:path';
+
 import {
   CurrentDirectory,
   FileSystem,
   JsonFile,
   JsonFileReader,
 } from '@chris.araneo/file-system';
-import Path from 'path';
 import { catchError, map, Observable } from 'rxjs';
 
 import { Config } from '../../models/config.type';
@@ -14,7 +15,7 @@ import {
 } from './config-loader.consts';
 
 export class ConfigLoader {
-  private jsonFileReader: JsonFileReader;
+  private readonly jsonFileReader: JsonFileReader;
 
   constructor(
     protected currentDirectory: CurrentDirectory,
@@ -28,18 +29,15 @@ export class ConfigLoader {
     const path = Path.normalize(`${currentDirectory}/dist/src/config.json`);
 
     return this.jsonFileReader.readFile(path).pipe(
-      map((result: unknown) => {
-        return (result as JsonFile)?.getContent();
-      }),
+      map((result: unknown) => (result as JsonFile)?.getContent()),
       catchError(() => {
-        throw Error(CONFIG_READING_ERROR_MESSAGE);
+        throw new Error(CONFIG_READING_ERROR_MESSAGE);
       }),
       map((content: unknown) => {
         if (this.isConfig(content)) {
           return content;
-        } else {
-          throw Error(INVALID_CONFIG_ERROR_MESSAGE);
         }
+        throw new Error(INVALID_CONFIG_ERROR_MESSAGE);
       }),
     );
   }

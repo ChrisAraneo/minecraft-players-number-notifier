@@ -1,4 +1,3 @@
-import { FileSystem } from '@chris.araneo/file-system';
 import {
   MakeDirectoryOptions,
   NoParamCallback,
@@ -6,7 +5,9 @@ import {
   PathOrFileDescriptor,
   Stats,
   WriteFileOptions,
-} from 'fs';
+} from 'node:fs';
+
+import { FileSystem } from '@chris.araneo/file-system';
 
 export class FileSystemMock extends FileSystem {
   override readdir(
@@ -72,15 +73,13 @@ export class FileSystemMock extends FileSystem {
     }
   }
 
-  override writeFile(
+  override async writeFile(
     file: PathOrFileDescriptor,
     data: string | NodeJS.ArrayBufferView,
     options: WriteFileOptions,
     callback: NoParamCallback,
   ): Promise<void> {
     callback(null);
-
-    return Promise.resolve();
   }
 
   override existsSync(path: PathLike): boolean {

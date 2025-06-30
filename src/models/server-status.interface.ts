@@ -1,4 +1,4 @@
-import { Player } from './player.type';
+import { Player } from './player.interface';
 
 export interface ServerStatus {
   server: string;

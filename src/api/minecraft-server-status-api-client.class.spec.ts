@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { Config } from '../models/config.type';
 import { MinecraftServerStatusApiClient } from './minecraft-server-status-api-client.class';
-import { StatusResponse } from './status-response.type';
+import { StatusResponse } from './status-response.interface';
 
 describe('MinecraftServerStatusApiClient', () => {
   let apiClient: MinecraftServerStatusApiClient;
@@ -82,12 +82,8 @@ describe('MinecraftServerStatusApiClient', () => {
 });
 
 class LoggerMock {
-  debug(): void {
-    return;
-  }
-  error(): void {
-    return;
-  }
+  debug(): void {}
+  error(): void {}
 }
 
 const config: Config = {
@@ -158,13 +154,10 @@ const dummyResponse: StatusResponse = {
   eula_blocked: false,
 };
 
-const mockSuccessFetch = (() =>
-  Promise.resolve({
-    json: () => Promise.resolve(dummyResponse),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  })) as unknown as (url: any, init: any) => Promise<Response>;
+const mockSuccessFetch = (async () => ({
+  json: async () => dummyResponse,
+})) as unknown as (url: any, init: any) => Promise<Response>;
 
-const mockErrorFetch = ((): Promise<unknown> => {
-  throw Error('Error');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockErrorFetch = (async (): Promise<unknown> => {
+  throw new Error('Error');
 }) as unknown as (url: any, init: any) => Promise<Response>;

@@ -1,4 +1,6 @@
-import { Argument } from './argument.type';
+import { isEmpty } from 'lodash';
+
+import { Argument } from './argument.interface';
 import { ArgumentKey } from './argument-key.type';
 import { DISCORD_TOKEN, RECIPIENTS } from './argument-keys.consts';
 import { Process } from './process.class';
@@ -15,10 +17,10 @@ export class ProgramArguments {
   }
 
   load(): Argument[] {
-    return (this.arguments || []).map((argument) => {
+    return (this.arguments ?? []).map((argument) => {
       const parts = argument.split('=');
 
-      if (parts.length > 1) {
+      if (!isEmpty(parts.length)) {
         const key: string = parts[0];
 
         if (!this.isArgumentKeyValid(key)) {

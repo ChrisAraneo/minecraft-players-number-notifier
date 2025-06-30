@@ -32,9 +32,9 @@ describe('ConfigLoader', () => {
       const config = await firstValueFrom(configLoader.readConfigFile());
 
       expect(config).toStrictEqual({
-        'cache-ttl': 30000,
+        'cache-ttl': 30_000,
         discord: true,
-        interval: 60000,
+        interval: 60_000,
         'log-level': 'debug',
         recipients: [],
         servers: ['0.0.0.0'],
@@ -48,7 +48,7 @@ describe('ConfigLoader', () => {
       try {
         await firstValueFrom(configLoader.readConfigFile());
       } catch (error: unknown) {
-        expect((error as Error)['message']).toBe(INVALID_CONFIG_ERROR_MESSAGE);
+        expect((error as Error).message).toBe(INVALID_CONFIG_ERROR_MESSAGE);
       }
     });
 
@@ -59,7 +59,7 @@ describe('ConfigLoader', () => {
       try {
         await firstValueFrom(configLoader.readConfigFile());
       } catch (error: unknown) {
-        expect((error as Error)['message']).toBe(CONFIG_READING_ERROR_MESSAGE);
+        expect((error as Error).message).toBe(CONFIG_READING_ERROR_MESSAGE);
       }
     });
 
@@ -70,7 +70,7 @@ describe('ConfigLoader', () => {
       try {
         await firstValueFrom(configLoader.readConfigFile());
       } catch (error: unknown) {
-        expect((error as Error)['message']).toBe(CONFIG_READING_ERROR_MESSAGE);
+        expect((error as Error).message).toBe(CONFIG_READING_ERROR_MESSAGE);
       }
     });
   });

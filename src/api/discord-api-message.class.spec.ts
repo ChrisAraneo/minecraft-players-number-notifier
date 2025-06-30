@@ -1,4 +1,4 @@
-import { Player } from '../models/player.type';
+import { Player } from '../models/player.interface';
 import { DiscordApiMessage } from './discord-api-message.class';
 
 describe('DiscordApiMessage', () => {
@@ -60,7 +60,7 @@ describe('DiscordApiMessage', () => {
 
       expect(message.getMessage()).toEqual(
         `2 players ${String.fromCodePoint(
-          0x1f6b6,
+          0x1_F6_B6,
         )} on server example.com: John, Adam`,
       );
     });

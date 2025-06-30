@@ -3,21 +3,24 @@ import { get, isArray, isNull, isNumber } from 'lodash';
 import { from, map, Observable, of } from 'rxjs';
 
 import { Config } from '../models/config.type';
-import { Cache } from './cache.type';
-import { NumberOfOnlinePlayersResult } from './number-of-online-players-result.type';
-import { PlayersListResult } from './players-list-result.type';
-import { StatusResponse } from './status-response.type';
+import { Cache } from './cache.interface';
+import { NumberOfOnlinePlayersResult } from './number-of-online-players-result.interface';
+import { PlayersListResult } from './players-list-result.interface';
+import { StatusResponse } from './status-response.interface';
 
 export class MinecraftServerStatusApiClient {
-  private static StatusEndpoint = `https://api.mcsrvstat.us/3`;
+  private static readonly StatusEndpoint = `https://api.mcsrvstat.us/3`;
   private static Cache = new Map<string, Cache>();
 
   private readonly CacheTTL: number;
 
   constructor(
-    private config: Config,
-    private logger: Logger,
-    private fetch: (url: string, init?: RequestInit) => Promise<Response>,
+    private readonly config: Config,
+    private readonly logger: Logger,
+    private readonly fetch: (
+      url: string,
+      init?: RequestInit,
+    ) => Promise<Response>,
   ) {
     this.CacheTTL = Number(this.config['cache-ttl']);
   }
@@ -35,13 +38,12 @@ export class MinecraftServerStatusApiClient {
         if (isArray(get(response, 'players.list'))) {
           return {
             success: true,
-            players: (response as StatusResponse).players.list,
-          };
-        } else {
-          return {
-            success: false,
+            players: response!.players.list,
           };
         }
+        return {
+          success: false,
+        };
       }),
     );
   }
@@ -55,13 +57,12 @@ export class MinecraftServerStatusApiClient {
         if (isNumber(get(response, 'players.online'))) {
           return {
             success: true,
-            online: (response as StatusResponse).players.online,
-          };
-        } else {
-          return {
-            success: false,
+            online: response!.players.online,
           };
         }
+        return {
+          success: false,
+        };
       }),
     );
   }
@@ -80,8 +81,7 @@ export class MinecraftServerStatusApiClient {
 
           try {
             response = await this.fetchServerStatus(server);
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          } catch (error: unknown) {
+          } catch {
             this.logger.error(`Error while fetching server status`);
             response = null;
           }
@@ -93,17 +93,14 @@ export class MinecraftServerStatusApiClient {
           resolve(response);
         }),
       );
-    } else {
-      this.logger.debug(
-        `Status cache didn't expire yet ${
-          new Date(cached?.timestamp || 0).toISOString() +
-          ' < ' +
-          now.toISOString()
-        }`,
-      );
-
-      return of(cached?.response || null);
     }
+    this.logger.debug(
+      `Status cache didn't expire yet ${new Date(
+        cached?.timestamp || 0,
+      ).toISOString()} < ${now.toISOString()}`,
+    );
+
+    return of(cached?.response || null);
   }
 
   private async fetchServerStatus(server: string): Promise<StatusResponse> {
@@ -134,8 +131,8 @@ export class MinecraftServerStatusApiClient {
     response: StatusResponse,
   ): void {
     MinecraftServerStatusApiClient.Cache.set(server, {
-      timestamp: timestamp,
-      response: response,
+      timestamp,
+      response,
     });
   }
 }

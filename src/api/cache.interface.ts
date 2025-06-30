@@ -1,4 +1,4 @@
-import { StatusResponse } from './status-response.type';
+import { StatusResponse } from './status-response.interface';
 
 export interface Cache {
   timestamp: Date;

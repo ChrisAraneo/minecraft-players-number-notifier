@@ -2,6 +2,38 @@ import { firstValueFrom } from 'rxjs';
 
 import { Store } from './store.class';
 
+const dummyStatuses = [
+  {
+    server: '0.0.0.0',
+    online: 1,
+    players: [
+      {
+        uuid: '6f9ca9ab-8f38-4cd8-a858-f8f2b950598a',
+        name: 'John',
+      },
+    ],
+  },
+  {
+    server: '1.1.1.1',
+    online: 0,
+    players: [],
+  },
+  {
+    server: '2.2.2.2',
+    online: 2,
+    players: [
+      {
+        uuid: '5a755c70-c39a-4811-a259-4e5aca7bdea7',
+        name: 'Adam',
+      },
+      {
+        uuid: '3af98ee8-16a4-4edb-9261-feb924a47d90',
+        name: 'Beth',
+      },
+    ],
+  },
+];
+
 describe('Store', () => {
   let store: Store;
 
@@ -77,34 +109,4 @@ describe('Store', () => {
   });
 });
 
-const dummyStatuses = [
-  {
-    server: '0.0.0.0',
-    online: 1,
-    players: [
-      {
-        uuid: '6f9ca9ab-8f38-4cd8-a858-f8f2b950598a',
-        name: 'John',
-      },
-    ],
-  },
-  {
-    server: '1.1.1.1',
-    online: 0,
-    players: [],
-  },
-  {
-    server: '2.2.2.2',
-    online: 2,
-    players: [
-      {
-        uuid: '5a755c70-c39a-4811-a259-4e5aca7bdea7',
-        name: 'Adam',
-      },
-      {
-        uuid: '3af98ee8-16a4-4edb-9261-feb924a47d90',
-        name: 'Beth',
-      },
-    ],
-  },
-];
+

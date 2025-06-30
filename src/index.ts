@@ -19,12 +19,12 @@ import {
 
 import { DiscordApiClient } from './api/discord-api-client.class';
 import { MinecraftServerStatusApiClient } from './api/minecraft-server-status-api-client.class';
-import { NumberOfOnlinePlayersResult } from './api/number-of-online-players-result.type';
-import { PlayersListResult } from './api/players-list-result.type';
+import { NumberOfOnlinePlayersResult } from './api/number-of-online-players-result.interface';
+import { PlayersListResult } from './api/players-list-result.interface';
 import { ConfigLoader } from './file-system/config-loader/config-loader.class';
 import { Config } from './models/config.type';
-import { Player } from './models/player.type';
-import { ServerStatus } from './models/server-status.type';
+import { Player } from './models/player.interface';
+import { ServerStatus } from './models/server-status.interface';
 import { EnvironmentVariables } from './process/environment-variables.class';
 import { Process } from './process/process.class';
 import { Store } from './store/store.class';
@@ -43,15 +43,15 @@ import { Store } from './store/store.class';
 
   const environmentVariables = new EnvironmentVariables(process).get();
 
-  if (environmentVariables['CI']) {
+  if (environmentVariables.CI) {
     return;
   }
 
-  Object.entries(environmentVariables).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(environmentVariables)) {
     if (!isUndefined(value)) {
       config[dashify(key).split('_').join('-')] = value;
     }
-  });
+  }
 
   if (Object.keys(config).length === 0) {
     new Logger('error').error('No config');
@@ -67,10 +67,8 @@ import { Store } from './store/store.class';
     | string
     | null;
 
-  const predefinedRecipients = (config['recipients'] || []) as
-    | string
-    | string[];
-  if (!!config.discord && isNull(token)) {
+  const predefinedRecipients = (config.recipients || []) as string | string[];
+  if (Boolean(config.discord) && isNull(token)) {
     logger.error('Token is null');
     return;
   }
@@ -87,10 +85,10 @@ import { Store } from './store/store.class';
       : null;
   const apiClient = new MinecraftServerStatusApiClient(config, logger, fetch);
 
-  if (environmentVariables['MPNN_HEALTH_CHECK_PORT']) {
+  if (environmentVariables.MPNN_HEALTH_CHECK_PORT) {
     new HealthCheckService(
       '/health',
-      Number(environmentVariables['MPNN_HEALTH_CHECK_PORT']),
+      Number(environmentVariables.MPNN_HEALTH_CHECK_PORT),
       logger,
     ).listen();
   }
@@ -155,9 +153,7 @@ import { Store } from './store/store.class';
 
   interval(Number(config.interval))
     .pipe(
-      mergeMap(() => {
-        return from((config.servers as string[]) || []);
-      }),
+      mergeMap(() => from((config.servers as string[]) || [])),
       tap((server: string) => {
         const getNumberOfOnlinePlayers =
           apiClient.getNumberOfOnlinePlayers(server);
