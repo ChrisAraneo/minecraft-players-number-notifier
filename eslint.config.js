@@ -20,6 +20,7 @@ export default [
       'no-void': 'off',
       'no-await-in-loop': 'off',
       'unicorn/prefer-ternary': 'off',
+      'unicorn/number-literal-case': 'off',
     },
   },
 ];
