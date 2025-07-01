@@ -1,10 +1,19 @@
+/* eslint-disable no-async-promise-executor */
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+/* eslint-disable @typescript-eslint/no-loop-func */
+
 import { Logger } from '@chris.araneo/logger';
 import { Client, Events, Partials, User } from 'discord.js';
+import { noop } from 'lodash';
 import { BehaviorSubject, debounceTime, Subscription } from 'rxjs';
 
 import { Config } from '../models/config.type';
 import { Player } from '../models/player.interface';
+import { MESSAGE_TO_SEND_DEBOUNCE_TIME } from './discord-api-client.consts';
 import { DiscordApiMessage } from './discord-api-message.class';
+import { THUMBS_UP_EMOJI, WAVING_HAND_EMOJI } from './emoji.consts';
 
 export class DiscordApiClient {
   private client!: Client;
@@ -17,7 +26,6 @@ export class DiscordApiClient {
   constructor(
     private readonly config: Config,
     private readonly logger: Logger,
-    private readonly token: string,
     recipientIds: string[] = [],
   ) {
     if (this.config.discord) {
@@ -25,36 +33,44 @@ export class DiscordApiClient {
 
       this.initializeClient();
       this.addRecipients(recipientIds);
-      this.login().then(() => {
-              this.subscribeToReceivingMessages();
-      this.subscribeToMessagesToSend();
-      }).catch((error: unknown) => {
-        this.logger.error('Error during DiscordApiClient initialization', error);
-      })
+      this.login()
+        .then(() => {
+          this.subscribeToReceivingMessages();
+          this.subscribeToMessagesToSend();
+        })
+        .catch((error: unknown) => {
+          this.logger.error(
+            'Error during DiscordApiClient initialization',
+            error,
+          );
+        });
     }
   }
 
-  sendMessage(
+  async sendMessage(
     server: string,
     numberOfPlayers: number,
     playersList: Player[],
-  ): void {
-    this.recipientIds.forEach(async (id) => {
-      let user: User | undefined;
+  ): Promise<void> {
+    await Promise.all(
+      this.recipientIds.map(async (id) => {
+        let user: User | undefined;
 
-      while (!user) {
-        try {
-          user = await this.client.users.fetch(id);
-        } catch {
-          this.logger.error(`Could not fetch user with ID ${id}`);
-          this.login();
+        while (!user) {
+          try {
+            user = await this.client.users.fetch(id);
+          } catch {
+            this.logger.error(`Could not fetch user with ID ${id}`);
+
+            void this.login();
+          }
         }
-      }
 
-      this.pushMessageToSend(
-        new DiscordApiMessage(user.id, server, numberOfPlayers, playersList),
-      );
-    });
+        this.pushMessageToSend(
+          new DiscordApiMessage(user.id, server, numberOfPlayers, playersList),
+        );
+      }),
+    );
   }
 
   private initializeClient(): void {
@@ -74,12 +90,13 @@ export class DiscordApiClient {
           );
           resolve();
         });
-      } catch (error) {
-        reject(error);
+      } catch (error: unknown) {
+        reject(error as Error);
       }
     }).catch(() => {
       this.logger.error('Could not login. Trying again.');
-      this.login();
+
+      void this.login();
     });
   }
 
@@ -96,17 +113,19 @@ export class DiscordApiClient {
       }
 
       const name = message.author.globalName;
-      const wavingHandEmoji = String.fromCodePoint(0x1_F4_4B);
-      const thumbsUpEmoji = String.fromCodePoint(0x1_F4_4D);
 
       message.author
         .send(
-          `Hello ${name} ${wavingHandEmoji}! I will notify you if new players join the MC servers ${thumbsUpEmoji}`,
+          `Hello ${name} ${WAVING_HAND_EMOJI}! I will notify you if new players join the MC servers ${THUMBS_UP_EMOJI}`,
         )
-        .then(() => {})
+        .then(noop)
         .catch((error: unknown) => {
-          this.logger.error(`Could not send message to ${name}`, ...error);
-          this.login();
+          this.logger.error(
+            `Could not send message to ${name}`,
+            ...(error as object[]),
+          );
+
+          void this.login();
         });
     });
   }
@@ -138,53 +157,17 @@ export class DiscordApiClient {
     this.subscription.add(
       this.messagesToSend
         .asObservable()
-        .pipe(debounceTime(1000))
+        .pipe(debounceTime(MESSAGE_TO_SEND_DEBOUNCE_TIME))
         .subscribe((messages) => {
           Promise.all(
             messages.map(
               async (message) =>
-                // eslint-disable-next-line no-async-promise-executor
                 new Promise<void>(async (resolve) => {
                   const recipientId = message.getRecipientId();
-                  let user: User | undefined;
 
-                  while (!user) {
-                    try {
-                      user = await this.client.users.fetch(recipientId);
-                    } catch {
-                      this.logger.error(
-                        `Could not fetch user with ID ${recipientId}`,
-                      );
-                      this.login();
-                    }
-                  }
+                  const user = await this.fetchUserUntilSuccess(recipientId);
 
-                  this.logger.info(
-                    `Sending message ${message.getId()} to user: ${user.id}`,
-                  );
-
-                  let isMessageSuccessfullySent = false;
-
-                  while (!isMessageSuccessfullySent) {
-                    try {
-                      await user.send(message.getMessage()).then(() => {
-                        isMessageSuccessfullySent = true;
-                      });
-                    } catch {
-                      this.logger.error(
-                        `Error while sending message ${message.getId()} to user: ${
-                          user.id
-                        }. Trying again.`,
-                      );
-                      isMessageSuccessfullySent = false;
-                    }
-                  }
-
-                  this.logger.info(
-                    `Message ${message.getId()} successfully sent to user: ${
-                      user.id
-                    }`,
-                  );
+                  await this.sendMessageUntilSuccess(user, message);
 
                   resolve();
                 }),
@@ -197,11 +180,55 @@ export class DiscordApiClient {
                   (item) =>
                     !messages
                       .map((message) => message.getId())
-                      .find((id) => id === item.getId()),
+                      .includes(item.getId()),
                 ),
             );
           });
         }),
+    );
+  }
+
+  private async fetchUserUntilSuccess(userId: string): Promise<User> {
+    let user: User | undefined;
+
+    while (!user) {
+      try {
+        user = await this.client.users.fetch(userId);
+      } catch {
+        this.logger.error(`Could not fetch user with ID ${userId}`);
+        void this.login();
+      }
+    }
+
+    return user;
+  }
+
+  private async sendMessageUntilSuccess(
+    user: User,
+    message: DiscordApiMessage,
+  ): Promise<void> {
+    this.logger.info(`Sending message ${message.getId()} to user: ${user.id}`);
+
+    let isMessageSuccessfullySent = false;
+
+    while (!isMessageSuccessfullySent) {
+      await user
+        .send(message.getMessage())
+        .then(() => {
+          isMessageSuccessfullySent = true;
+        })
+        .catch(() => {
+          this.logger.error(
+            `Error while sending message ${message.getId()} to user: ${
+              user.id
+            }. Trying again.`,
+          );
+          isMessageSuccessfullySent = false;
+        });
+    }
+
+    this.logger.info(
+      `Message ${message.getId()} successfully sent to user: ${user.id}`,
     );
   }
 }
