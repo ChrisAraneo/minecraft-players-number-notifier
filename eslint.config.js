@@ -17,6 +17,9 @@ export default [
     files: ['**/*.ts'],
     rules: {
       '@typescript-eslint/max-params': 'off',
+      'no-void': 'off',
+      'no-await-in-loop': 'off',
+      'unicorn/prefer-ternary': 'off',
     },
   },
 ];
