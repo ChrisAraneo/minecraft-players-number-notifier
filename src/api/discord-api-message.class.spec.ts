@@ -24,7 +24,7 @@ describe('DiscordApiMessage', () => {
   });
 
   describe('getId', () => {
-    it('should return id', async () => {
+    it('should return id', () => {
       const message = new DiscordApiMessage(
         recipientId,
         server,
@@ -37,7 +37,7 @@ describe('DiscordApiMessage', () => {
   });
 
   describe('getRecipientId', () => {
-    it('should return recipient id', async () => {
+    it('should return recipient id', () => {
       const message = new DiscordApiMessage(
         recipientId,
         server,
@@ -50,7 +50,7 @@ describe('DiscordApiMessage', () => {
   });
 
   describe('getMessage', () => {
-    it('should return message content', async () => {
+    it('should return message content', () => {
       const message = new DiscordApiMessage(
         recipientId,
         server,
@@ -60,7 +60,7 @@ describe('DiscordApiMessage', () => {
 
       expect(message.getMessage()).toEqual(
         `2 players ${String.fromCodePoint(
-          0x1_F6_B6,
+          0x1_f6_b6,
         )} on server example.com: John, Adam`,
       );
     });
