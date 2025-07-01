@@ -1,8 +1,6 @@
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/no-loop-func */
 
 import { Logger } from '@chris.araneo/logger';
 import { Client, Events, Partials, User } from 'discord.js';
@@ -189,18 +187,20 @@ export class DiscordApiClient {
   }
 
   private async fetchUserUntilSuccess(userId: string): Promise<User> {
-    let user: User | undefined;
+    const fetchUserWithRetry = async (): Promise<User> => {
+      let user: User | undefined;
 
-    while (!user) {
       try {
         user = await this.client.users.fetch(userId);
       } catch {
         this.logger.error(`Could not fetch user with ID ${userId}`);
         void this.login();
       }
-    }
 
-    return user;
+      return user ?? await fetchUserWithRetry();
+    };
+
+    return fetchUserWithRetry();
   }
 
   private async sendMessageUntilSuccess(
@@ -209,23 +209,19 @@ export class DiscordApiClient {
   ): Promise<void> {
     this.logger.info(`Sending message ${message.getId()} to user: ${user.id}`);
 
-    let isMessageSuccessfullySent = false;
+    const sendMessageWithRetry = async (): Promise<void> => {
+      try {
+        await user.send(message.getMessage());
+      } catch {
+        this.logger.error(
+          `Error while sending message ${message.getId()} to user: ${user.id}. Trying again.`,
+        );
 
-    while (!isMessageSuccessfullySent) {
-      await user
-        .send(message.getMessage())
-        .then(() => {
-          isMessageSuccessfullySent = true;
-        })
-        .catch(() => {
-          this.logger.error(
-            `Error while sending message ${message.getId()} to user: ${
-              user.id
-            }. Trying again.`,
-          );
-          isMessageSuccessfullySent = false;
-        });
-    }
+        await sendMessageWithRetry();
+      }
+    };
+
+    await sendMessageWithRetry();
 
     this.logger.info(
       `Message ${message.getId()} successfully sent to user: ${user.id}`,
