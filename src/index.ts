@@ -77,7 +77,6 @@ import { Store } from './store/store.class';
       ? new DiscordApiClient(
           config,
           logger,
-          token,
           Array.isArray(predefinedRecipients)
             ? [...predefinedRecipients]
             : [predefinedRecipients],

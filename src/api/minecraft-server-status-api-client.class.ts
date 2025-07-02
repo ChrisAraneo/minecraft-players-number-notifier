@@ -35,12 +35,15 @@ export class MinecraftServerStatusApiClient {
   ): Observable<PlayersListResult> {
     return this.getServerStatus(server, now).pipe(
       map((response) => {
-        if (isArray(get(response, 'players.list'))) {
+        const players = get(response, 'players.list');
+
+        if (isArray(players)) {
           return {
             success: true,
-            players: response!.players.list,
+            players,
           };
         }
+
         return {
           success: false,
         };
@@ -54,12 +57,15 @@ export class MinecraftServerStatusApiClient {
   ): Observable<NumberOfOnlinePlayersResult> {
     return this.getServerStatus(server, now).pipe(
       map((response) => {
-        if (isNumber(get(response, 'players.online'))) {
+        const onlinePlayers = get(response, 'players.online');
+
+        if (isNumber(onlinePlayers)) {
           return {
             success: true,
-            online: response!.players.online,
+            online: onlinePlayers,
           };
         }
+
         return {
           success: false,
         };
@@ -75,32 +81,33 @@ export class MinecraftServerStatusApiClient {
 
     if (this.isCacheOutdated(cached, now)) {
       return from(
-        // eslint-disable-next-line no-async-promise-executor
-        new Promise<StatusResponse | null>(async (resolve) => {
-          let response: StatusResponse | null = null;
-
+        (async (): Promise<StatusResponse | null> => {
           try {
-            response = await this.fetchServerStatus(server);
+            const response = await this.fetchServerStatus(server);
+
+            if (!isNull(response)) {
+              this.updateCache(server, now, response);
+            }
+
+            return response;
           } catch {
             this.logger.error(`Error while fetching server status`);
-            response = null;
-          }
 
-          if (!isNull(response)) {
-            this.updateCache(server, now, response);
+            return null;
           }
-
-          resolve(response);
-        }),
+        })(),
       );
     }
-    this.logger.debug(
-      `Status cache didn't expire yet ${new Date(
-        cached?.timestamp || 0,
-      ).toISOString()} < ${now.toISOString()}`,
-    );
 
-    return of(cached?.response || null);
+    if (isNumber(cached?.timestamp)) {
+      this.logger.debug(
+        `Status cache didn't expire yet ${new Date(
+          cached.timestamp,
+        ).toISOString()} < ${now.toISOString()}`,
+      );
+    }
+
+    return of(cached?.response ?? null);
   }
 
   private async fetchServerStatus(server: string): Promise<StatusResponse> {
@@ -122,7 +129,7 @@ export class MinecraftServerStatusApiClient {
   }
 
   private isCacheOutdated(cached: Cache | undefined, now: Date): boolean {
-    return !cached?.timestamp || +cached.timestamp + this.CacheTTL < +now;
+    return !cached?.timestamp || Number(cached.timestamp) + this.CacheTTL < Number(now);
   }
 
   private updateCache(
