@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-
 import crypto from 'node:crypto';
+
+import { isEmpty } from 'lodash';
 
 import { Player } from '../models/player.interface';
 import { MAN_WALKING_EMOJI } from './emoji.consts';
@@ -12,8 +12,8 @@ export class DiscordApiMessage {
   constructor(
     private readonly recipientId: string,
     private readonly server: string,
-    private readonly numberOfPlayers = 0,
-    private readonly playersList: Player[] = [],
+    private readonly numberOfPlayers: number,
+    private readonly playersList: Player[],
   ) {
     this.initializeId();
     this.initializeMessage();
@@ -41,10 +41,11 @@ export class DiscordApiMessage {
   }
 
   private initializeMessage(): void {
-    if (this.numberOfPlayers === 0) {
+    if (isEmpty(this.numberOfPlayers)) {
       this.message = `No players on server ${this.server}`;
     } else {
       this.message = `${this.numberOfPlayers} player${
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         this.numberOfPlayers === 1 ? '' : 's'
       } ${MAN_WALKING_EMOJI} on server ${this.server}: ${this.playersList
         .map((player) => player.name)
