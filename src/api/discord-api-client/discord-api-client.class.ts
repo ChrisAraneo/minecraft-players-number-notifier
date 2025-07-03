@@ -43,8 +43,8 @@ export class DiscordApiClient {
 
   async sendMessage(
     server: string,
-    numberOfPlayers: number,
-    playersList: Player[],
+    playerCount: number,
+    players: Player[],
   ): Promise<void> {
     await Promise.all(
       this.recipientIds.map(async (id) => {
@@ -61,7 +61,7 @@ export class DiscordApiClient {
         }
 
         this.addPendingMessage(
-          new DiscordApiMessage(user.id, server, numberOfPlayers, playersList),
+          new DiscordApiMessage(user.id, server, playerCount, players),
         );
       }),
     );
@@ -138,9 +138,7 @@ export class DiscordApiClient {
   private addPendingMessage(message: DiscordApiMessage): void {
     const id = message.getId();
     const currentPendingMessages = this.pendingMessages.getValue();
-    const found = currentPendingMessages.find(
-      (item) => item.getId() === id,
-    );
+    const found = currentPendingMessages.find((item) => item.getId() === id);
 
     if (!found) {
       this.logger.info(`Adding message to queue: ${id}`);
@@ -155,30 +153,33 @@ export class DiscordApiClient {
         .pipe(debounceTime(MESSAGE_TO_SEND_DEBOUNCE_TIME))
         .subscribe((messages) => {
           Promise.all(
-            messages.map(
-              async (message) => {
-                  const recipientId = message.getRecipientId();
+            messages.map(async (message) => {
+              const recipientId = message.getRecipientId();
 
-                  return this.fetchUserUntilSuccess(recipientId).then(
-                    async (user) => this.sendMessageUntilSuccess(user, message),
-                  );
-              }
-            ),
-          ).then(() => {
-            this.pendingMessages.next(
-              this.pendingMessages
-                .getValue()
-                .filter(
-                  (item) =>
-                    !messages
-                      .map((message) => message.getId())
-                      .includes(item.getId()),
-                ),
-            );
-          }).catch((error: unknown) => {
-            this.logger.error(`Error while processing pending messages`, error);
-            void this.login();
-          });
+              return this.fetchUserUntilSuccess(recipientId).then(
+                async (user) => this.sendMessageUntilSuccess(user, message),
+              );
+            }),
+          )
+            .then(() => {
+              this.pendingMessages.next(
+                this.pendingMessages
+                  .getValue()
+                  .filter(
+                    (item) =>
+                      !messages
+                        .map((message) => message.getId())
+                        .includes(item.getId()),
+                  ),
+              );
+            })
+            .catch((error: unknown) => {
+              this.logger.error(
+                `Error while processing pending messages`,
+                error,
+              );
+              void this.login();
+            });
         }),
     );
   }
@@ -194,7 +195,7 @@ export class DiscordApiClient {
         void this.login();
       }
 
-      return user ?? await f();
+      return user ?? (await f());
     };
 
     return f();
