@@ -1,22 +1,18 @@
-/* eslint-disable no-async-promise-executor */
-/* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @typescript-eslint/no-floating-promises */
-
 import { Logger } from '@chris.araneo/logger';
 import { Client, Events, Partials, User } from 'discord.js';
 import { noop } from 'lodash';
 import { BehaviorSubject, debounceTime, Subscription } from 'rxjs';
 
-import { Config } from '../models/config.type';
-import { Player } from '../models/player.interface';
+import { Config } from '../../models/config.type';
+import { Player } from '../../models/player.interface';
+import { THUMBS_UP_EMOJI, WAVING_HAND_EMOJI } from '../../utils/emoji.consts';
+import { DiscordApiMessage } from '../discord-api-message/discord-api-message.class';
 import { MESSAGE_TO_SEND_DEBOUNCE_TIME } from './discord-api-client.consts';
-import { DiscordApiMessage } from './discord-api-message.class';
-import { THUMBS_UP_EMOJI, WAVING_HAND_EMOJI } from './emoji.consts';
 
 export class DiscordApiClient {
   private client!: Client;
   private readonly recipientIds: string[] = [];
-  private readonly messagesToSend = new BehaviorSubject<DiscordApiMessage[]>(
+  private readonly pendingMessages = new BehaviorSubject<DiscordApiMessage[]>(
     [],
   );
   private readonly subscription = new Subscription();
@@ -33,8 +29,8 @@ export class DiscordApiClient {
       this.addRecipients(recipientIds);
       this.login()
         .then(() => {
-          this.subscribeToReceivingMessages();
-          this.subscribeToMessagesToSend();
+          this.subscribeToReceivedMessages();
+          this.subscribeToPendingMessages();
         })
         .catch((error: unknown) => {
           this.logger.error(
@@ -64,7 +60,7 @@ export class DiscordApiClient {
           }
         }
 
-        this.pushMessageToSend(
+        this.addPendingMessage(
           new DiscordApiMessage(user.id, server, numberOfPlayers, playersList),
         );
       }),
@@ -98,7 +94,7 @@ export class DiscordApiClient {
     });
   }
 
-  private subscribeToReceivingMessages(): void {
+  private subscribeToReceivedMessages(): void {
     this.client.on(Events.MessageCreate, (message) => {
       if (message.author.bot) {
         return;
@@ -139,40 +135,38 @@ export class DiscordApiClient {
     this.recipientIds.push(id);
   }
 
-  private pushMessageToSend(message: DiscordApiMessage): void {
-    const currentMessages = this.messagesToSend.getValue();
-    const found = currentMessages.find(
-      (item) => item.getId() === message.getId(),
+  private addPendingMessage(message: DiscordApiMessage): void {
+    const id = message.getId();
+    const currentPendingMessages = this.pendingMessages.getValue();
+    const found = currentPendingMessages.find(
+      (item) => item.getId() === id,
     );
 
     if (!found) {
-      this.logger.info(`Adding message to queue: ${message.getId()}`);
-      this.messagesToSend.next([...currentMessages, message]);
+      this.logger.info(`Adding message to queue: ${id}`);
+      this.pendingMessages.next([...currentPendingMessages, message]);
     }
   }
 
-  private subscribeToMessagesToSend(): void {
+  private subscribeToPendingMessages(): void {
     this.subscription.add(
-      this.messagesToSend
+      this.pendingMessages
         .asObservable()
         .pipe(debounceTime(MESSAGE_TO_SEND_DEBOUNCE_TIME))
         .subscribe((messages) => {
           Promise.all(
             messages.map(
-              async (message) =>
-                new Promise<void>(async (resolve) => {
+              async (message) => {
                   const recipientId = message.getRecipientId();
 
-                  const user = await this.fetchUserUntilSuccess(recipientId);
-
-                  await this.sendMessageUntilSuccess(user, message);
-
-                  resolve();
-                }),
+                  return this.fetchUserUntilSuccess(recipientId).then(
+                    async (user) => this.sendMessageUntilSuccess(user, message),
+                  );
+              }
             ),
           ).then(() => {
-            this.messagesToSend.next(
-              this.messagesToSend
+            this.pendingMessages.next(
+              this.pendingMessages
                 .getValue()
                 .filter(
                   (item) =>
@@ -181,13 +175,16 @@ export class DiscordApiClient {
                       .includes(item.getId()),
                 ),
             );
+          }).catch((error: unknown) => {
+            this.logger.error(`Error while processing pending messages`, error);
+            void this.login();
           });
         }),
     );
   }
 
   private async fetchUserUntilSuccess(userId: string): Promise<User> {
-    const fetchUserWithRetry = async (): Promise<User> => {
+    const f = async (): Promise<User> => {
       let user: User | undefined;
 
       try {
@@ -197,10 +194,10 @@ export class DiscordApiClient {
         void this.login();
       }
 
-      return user ?? await fetchUserWithRetry();
+      return user ?? await f();
     };
 
-    return fetchUserWithRetry();
+    return f();
   }
 
   private async sendMessageUntilSuccess(
@@ -209,7 +206,7 @@ export class DiscordApiClient {
   ): Promise<void> {
     this.logger.info(`Sending message ${message.getId()} to user: ${user.id}`);
 
-    const sendMessageWithRetry = async (): Promise<void> => {
+    const f = async (): Promise<void> => {
       try {
         await user.send(message.getMessage());
       } catch {
@@ -217,11 +214,11 @@ export class DiscordApiClient {
           `Error while sending message ${message.getId()} to user: ${user.id}. Trying again.`,
         );
 
-        await sendMessageWithRetry();
+        await f();
       }
     };
 
-    await sendMessageWithRetry();
+    await f();
 
     this.logger.info(
       `Message ${message.getId()} successfully sent to user: ${user.id}`,

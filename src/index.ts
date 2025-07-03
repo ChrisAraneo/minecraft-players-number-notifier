@@ -17,10 +17,10 @@ import {
   tap,
 } from 'rxjs';
 
-import { DiscordApiClient } from './api/discord-api-client.class';
-import { MinecraftServerStatusApiClient } from './api/minecraft-server-status-api-client.class';
-import { NumberOfOnlinePlayersResult } from './api/number-of-online-players-result.interface';
-import { PlayersListResult } from './api/players-list-result.interface';
+import { DiscordApiClient } from './api/discord-api-client/discord-api-client.class';
+import { NumberOfOnlinePlayersResult } from './api/interfaces/number-of-online-players-result.interface';
+import { PlayersListResult } from './api/interfaces/players-list-result.interface';
+import { MinecraftServerStatusApiClient } from './api/minecraft-server-status-api-client/minecraft-server-status-api-client.class';
 import { ConfigLoader } from './file-system/config-loader/config-loader.class';
 import { Config } from './models/config.type';
 import { Player } from './models/player.interface';

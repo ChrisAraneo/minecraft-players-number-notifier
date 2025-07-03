@@ -1,4 +1,4 @@
-import { Player } from '../models/player.interface';
+import { Player } from '../../models/player.interface';
 import { DiscordApiMessage } from './discord-api-message.class';
 
 describe('DiscordApiMessage', () => {

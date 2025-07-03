@@ -1,9 +1,9 @@
 import { Logger } from '@chris.araneo/logger';
 import { firstValueFrom } from 'rxjs';
 
-import { Config } from '../models/config.type';
+import { Config } from '../../models/config.type';
+import { StatusResponse } from '../interfaces/status-response.interface';
 import { MinecraftServerStatusApiClient } from './minecraft-server-status-api-client.class';
-import { StatusResponse } from './status-response.interface';
 
 describe('MinecraftServerStatusApiClient', () => {
   let apiClient: MinecraftServerStatusApiClient;

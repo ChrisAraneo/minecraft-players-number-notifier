@@ -1,4 +1,4 @@
-import { Player } from '../models/player.interface';
+import { Player } from '../../models/player.interface';
 
 export interface StatusResponse {
   ip: string;
