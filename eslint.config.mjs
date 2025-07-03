@@ -10,8 +10,9 @@ export default [
       'package.json',
       'node_modules/**',
       'dist/**',
-      'eslint.config.js',
+      'eslint.config.mjs',
     ],
+    tsconfigRootDir: import.meta.dirname,
   }),
   {
     files: ['**/*.ts'],
