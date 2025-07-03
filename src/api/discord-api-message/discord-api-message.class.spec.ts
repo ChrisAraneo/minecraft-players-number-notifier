@@ -4,14 +4,14 @@ import { DiscordApiMessage } from './discord-api-message.class';
 describe('DiscordApiMessage', () => {
   let recipientId: string;
   let server: string;
-  let numberOfPlayers: number;
-  let playersList: Player[];
+  let playerCount: number;
+  let players: Player[];
 
   beforeEach(() => {
     recipientId = '5468';
     server = 'example.com';
-    numberOfPlayers = 2;
-    playersList = [
+    playerCount = 2;
+    players = [
       {
         uuid: '6f9ca9ab-8f38-4cd8-a858-f8f2b950598a',
         name: 'John',
@@ -28,8 +28,8 @@ describe('DiscordApiMessage', () => {
       const message = new DiscordApiMessage(
         recipientId,
         server,
-        numberOfPlayers,
-        playersList,
+        playerCount,
+        players,
       );
 
       expect(message.getId()).toEqual('c615b6276813e57a0f463b75b44407ec');
@@ -41,8 +41,8 @@ describe('DiscordApiMessage', () => {
       const message = new DiscordApiMessage(
         recipientId,
         server,
-        numberOfPlayers,
-        playersList,
+        playerCount,
+        players,
       );
 
       expect(message.getRecipientId()).toEqual(recipientId);
@@ -54,8 +54,8 @@ describe('DiscordApiMessage', () => {
       const message = new DiscordApiMessage(
         recipientId,
         server,
-        numberOfPlayers,
-        playersList,
+        playerCount,
+        players,
       );
 
       expect(message.getMessage()).toEqual(
