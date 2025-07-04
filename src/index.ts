@@ -20,7 +20,7 @@ import {
 import { DiscordApiClient } from './api/discord-api-client/discord-api-client.class';
 import { NumberOfOnlinePlayersResult } from './api/interfaces/number-of-online-players-result.interface';
 import { PlayersListResult } from './api/interfaces/players-list-result.interface';
-import { MinecraftServerStatusApiClient } from './api/minecraft-server-status-api-client/minecraft-server-status-api-client.class';
+import { ServerStatusApiClient } from './api/server-status-api-client/server-status-api-client.class';
 import { ConfigLoader } from './file-system/config-loader/config-loader.class';
 import { Config } from './models/config.type';
 import { Player } from './models/player.interface';
@@ -82,7 +82,7 @@ import { Store } from './store/store.class';
             : [predefinedRecipients],
         )
       : null;
-  const apiClient = new MinecraftServerStatusApiClient(config, logger, fetch);
+  const apiClient = new ServerStatusApiClient(config, logger, fetch);
 
   if (environmentVariables.MPNN_HEALTH_CHECK_PORT) {
     new HealthCheckService(

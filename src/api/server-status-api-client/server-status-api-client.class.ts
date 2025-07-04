@@ -8,7 +8,7 @@ import { NumberOfOnlinePlayersResult } from '../interfaces/number-of-online-play
 import { PlayersListResult } from '../interfaces/players-list-result.interface';
 import { StatusResponse } from '../interfaces/status-response.interface';
 
-export class MinecraftServerStatusApiClient {
+export class ServerStatusApiClient {
   private static readonly StatusEndpoint = `https://api.mcsrvstat.us/3`;
   private static Cache = new Map<string, Cache>();
 
@@ -26,7 +26,7 @@ export class MinecraftServerStatusApiClient {
   }
 
   static clearCache(): void {
-    MinecraftServerStatusApiClient.Cache = new Map<string, Cache>();
+    ServerStatusApiClient.Cache = new Map<string, Cache>();
   }
 
   getPlayersList(
@@ -111,7 +111,7 @@ export class MinecraftServerStatusApiClient {
   }
 
   private async fetchServerStatus(server: string): Promise<StatusResponse> {
-    const url = `${MinecraftServerStatusApiClient.StatusEndpoint}/${server}`;
+    const url = `${ServerStatusApiClient.StatusEndpoint}/${server}`;
 
     this.logger.debug(`GET ${url}`);
 
@@ -125,7 +125,7 @@ export class MinecraftServerStatusApiClient {
   }
 
   private getCache(server: string): Cache | undefined {
-    return MinecraftServerStatusApiClient.Cache.get(server);
+    return ServerStatusApiClient.Cache.get(server);
   }
 
   private isCacheOutdated(cached: Cache | undefined, now: Date): boolean {
@@ -140,7 +140,7 @@ export class MinecraftServerStatusApiClient {
     timestamp: Date,
     response: StatusResponse,
   ): void {
-    MinecraftServerStatusApiClient.Cache.set(server, {
+    ServerStatusApiClient.Cache.set(server, {
       timestamp,
       response,
     });

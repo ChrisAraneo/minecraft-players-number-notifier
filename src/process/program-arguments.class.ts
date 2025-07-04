@@ -1,5 +1,8 @@
-import { isEmpty } from 'lodash';
+import { first, isEmpty, isString } from 'lodash';
 
+import { hasMoreThanOneItem } from '../utils/has-more-than-one-item.function';
+import { second } from '../utils/second.function';
+import { sliceTwo } from '../utils/slice-two.function';
 import { Argument } from './argument.interface';
 import { ArgumentKey } from './argument-key.type';
 import { DISCORD_TOKEN, RECIPIENTS } from './argument-keys.consts';
@@ -10,44 +13,54 @@ import {
 } from './program-arguments.consts';
 
 export class ProgramArguments {
-  private arguments?: string[];
+  private readonly arguments: string[];
 
   constructor(private readonly process: Process) {
-    this.initialize();
+    this.arguments = sliceTwo([...this.process.argv]);
   }
 
   load(): Argument[] {
-    return (this.arguments ?? []).map((argument) => {
-      const parts = argument.split('=');
+    return this.arguments.map((argument) => {
+      const argumentParts = argument.split('=');
 
-      if (!isEmpty(parts.length)) {
-        const key: string = parts[0];
+      this.partsNotEmptyOrThrow(argumentParts);
 
-        if (!this.isArgumentKeyValid(key)) {
-          throw new Error(INCORRECT_ARGUMENT_KEY_ERROR_MESSAGE);
-        }
+      const key = first(argumentParts);
+      const value = second(argumentParts);
 
-        const valueParts = parts[1].split(';');
+      this.argumentKeyIsValidOrThrow(key);
+      this.valueIsStringOrThrow(value);
 
-        return {
-          key,
-          value: valueParts.length > 1 ? valueParts : valueParts[0],
-        };
-      }
-      throw new Error(INCORRECT_ARGUMENT_VALUE_ERROR_MESSAGE);
+      const valueParts = value.split(';');
+
+      return {
+        key,
+        value: hasMoreThanOneItem(valueParts) ? valueParts : first(valueParts),
+      };
     });
   }
 
-  private initialize(): void {
-    if (!this.arguments) {
-      const { argv } = this.process;
-      const { length } = argv;
-
-      this.arguments = argv.slice(2, length);
+  private argumentKeyIsValidOrThrow(
+    key: string | undefined,
+  ): asserts key is ArgumentKey {
+    if (key !== DISCORD_TOKEN && key !== RECIPIENTS) {
+      throw new Error(INCORRECT_ARGUMENT_KEY_ERROR_MESSAGE);
     }
   }
 
-  private isArgumentKeyValid(key: string): key is ArgumentKey {
-    return key === DISCORD_TOKEN || key === RECIPIENTS;
+  private partsNotEmptyOrThrow(
+    parts: string[],
+  ): asserts parts is [string, ...string[]] {
+    if (isEmpty(parts)) {
+      throw new Error(INCORRECT_ARGUMENT_VALUE_ERROR_MESSAGE);
+    }
+  }
+
+  private valueIsStringOrThrow(
+    value: string | undefined,
+  ): asserts value is string {
+    if (!isString(value)) {
+      throw new Error(INCORRECT_ARGUMENT_VALUE_ERROR_MESSAGE);
+    }
   }
 }
