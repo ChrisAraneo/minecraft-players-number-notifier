@@ -154,12 +154,12 @@ import { Store } from './store/store.class';
     .pipe(
       mergeMap(() => from((config.servers as string[]) || [])),
       tap((server: string) => {
-        const getNumberOfOnlinePlayers =
-          apiClient.getNumberOfOnlinePlayers(server);
-        const getListOfPlayerNames = apiClient.getPlayersList(server);
+        const playerCount =
+          apiClient.getPlayerCount(server);
+        const getListOfPlayerNames = apiClient.getPlayers(server);
 
         firstValueFrom(
-          getNumberOfOnlinePlayers.pipe(
+          playerCount.pipe(
             logNumberOfPlayers(server),
             logPlayerNames(getListOfPlayerNames, server),
           ),

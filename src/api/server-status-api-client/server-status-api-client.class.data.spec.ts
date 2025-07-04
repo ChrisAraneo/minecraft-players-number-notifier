@@ -1,8 +1,8 @@
-import { Logger } from "@chris.araneo/logger";
-import { noop } from "rxjs";
+import { Logger } from '@chris.araneo/logger';
+import { noop } from 'rxjs';
 
-import { Config } from "../../models/config.type";
-import { StatusResponse } from "../interfaces/status-response.interface";
+import { Config } from '../../models/config.type';
+import { StatusResponse } from '../interfaces/status-response.interface';
 
 export class LoggerMock extends Logger {
   override debug = noop;

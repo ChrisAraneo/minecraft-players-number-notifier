@@ -2,7 +2,13 @@ import { Logger } from '@chris.araneo/logger';
 import { firstValueFrom } from 'rxjs';
 
 import { ServerStatusApiClient } from './server-status-api-client.class';
-import { DUMMY_CONFIG, DUMMY_RESPONSE, LoggerMock, mockErrorFetch, mockSuccessFetch } from './server-status-api-client.class.data.spec';
+import {
+  DUMMY_CONFIG,
+  DUMMY_RESPONSE,
+  LoggerMock,
+  mockErrorFetch,
+  mockSuccessFetch,
+} from './server-status-api-client.class.data.spec';
 
 describe('ServerStatusApiClient', () => {
   let apiClient: ServerStatusApiClient;
@@ -12,7 +18,7 @@ describe('ServerStatusApiClient', () => {
     logger = new LoggerMock();
   });
 
-  describe('getPlayersList', () => {
+  describe('getPlayers', () => {
     it('should return successful response with players list', async () => {
       apiClient = new ServerStatusApiClient(
         DUMMY_CONFIG,
@@ -22,7 +28,7 @@ describe('ServerStatusApiClient', () => {
       ServerStatusApiClient.clearCache();
 
       const result = await firstValueFrom(
-        apiClient.getPlayersList('example.com'),
+        apiClient.getPlayers('example.com'),
       );
 
       expect(result).toEqual({
@@ -40,14 +46,14 @@ describe('ServerStatusApiClient', () => {
       ServerStatusApiClient.clearCache();
 
       const result = await firstValueFrom(
-        apiClient.getPlayersList('example.com'),
+        apiClient.getPlayers('example.com'),
       );
 
       expect(result).toEqual({ success: false });
     });
   });
 
-  describe('getNumberOfOnlinePlayers', () => {
+  describe('getPlayerCount', () => {
     it('should return successful response with number of online players', async () => {
       apiClient = new ServerStatusApiClient(
         DUMMY_CONFIG,
@@ -57,7 +63,7 @@ describe('ServerStatusApiClient', () => {
       ServerStatusApiClient.clearCache();
 
       const result = await firstValueFrom(
-        apiClient.getNumberOfOnlinePlayers('example.com'),
+        apiClient.getPlayerCount('example.com'),
       );
 
       expect(result).toEqual({ success: true, online: 3 });
@@ -72,11 +78,10 @@ describe('ServerStatusApiClient', () => {
       ServerStatusApiClient.clearCache();
 
       const result = await firstValueFrom(
-        apiClient.getNumberOfOnlinePlayers('example.com'),
+        apiClient.getPlayerCount('example.com'),
       );
 
       expect(result).toEqual({ success: false });
     });
   });
 });
-

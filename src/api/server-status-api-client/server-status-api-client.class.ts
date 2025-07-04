@@ -29,7 +29,7 @@ export class ServerStatusApiClient {
     ServerStatusApiClient.Cache = new Map<string, Cache>();
   }
 
-  getPlayersList(
+  getPlayers(
     server: string,
     now: Date = new Date(),
   ): Observable<PlayersListResult> {
@@ -51,7 +51,7 @@ export class ServerStatusApiClient {
     );
   }
 
-  getNumberOfOnlinePlayers(
+  getPlayerCount(
     server: string,
     now: Date = new Date(),
   ): Observable<NumberOfOnlinePlayersResult> {
