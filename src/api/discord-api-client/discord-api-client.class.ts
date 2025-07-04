@@ -55,7 +55,6 @@ export class DiscordApiClient {
             user = await this.client.users.fetch(id);
           } catch {
             this.logger.error(`Could not fetch user with ID ${id}`);
-
             void this.login();
           }
         }
@@ -89,7 +88,6 @@ export class DiscordApiClient {
       }
     }).catch(() => {
       this.logger.error('Could not login. Trying again.');
-
       void this.login();
     });
   }
@@ -116,9 +114,8 @@ export class DiscordApiClient {
         .catch((error: unknown) => {
           this.logger.error(
             `Could not send message to ${name}`,
-            ...error,
+            error,
           );
-
           void this.login();
         });
     });
