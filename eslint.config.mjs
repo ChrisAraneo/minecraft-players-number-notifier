@@ -14,7 +14,7 @@ export default [
     ],
     tsconfigRootDir: import.meta.dirname,
   }),
-    {
+  {
     files: ['**/!(*.spec).{ts,js,mjs}'],
     rules: {
       '@typescript-eslint/max-params': 'off',

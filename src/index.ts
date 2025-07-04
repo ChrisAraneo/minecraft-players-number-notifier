@@ -154,8 +154,7 @@ import { Store } from './store/store.class';
     .pipe(
       mergeMap(() => from((config.servers as string[]) || [])),
       tap((server: string) => {
-        const playerCount =
-          apiClient.getPlayerCount(server);
+        const playerCount = apiClient.getPlayerCount(server);
         const getListOfPlayerNames = apiClient.getPlayers(server);
 
         firstValueFrom(

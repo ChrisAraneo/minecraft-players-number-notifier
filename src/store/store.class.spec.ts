@@ -60,7 +60,11 @@ describe('Store', () => {
     it('should return different result when status was upated', async () => {
       store.updateServerStatus(dummyStatuses[0]);
 
-      store.updateServerStatus({ ...dummyStatuses[0], online: 0, players: [] });
+      store.updateServerStatus({
+        ...dummyStatuses[0],
+        online: 0,
+        players: [],
+      });
       const result = await firstValueFrom(store.getServerStatus('0.0.0.0'));
 
       expect(result).toStrictEqual({
@@ -97,11 +101,19 @@ describe('Store', () => {
       store.updateServerStatus(dummyStatuses[1]);
       store.updateServerStatus(dummyStatuses[2]);
 
-      store.updateServerStatus({ ...dummyStatuses[0], online: 0, players: [] });
+      store.updateServerStatus({
+        ...dummyStatuses[0],
+        online: 0,
+        players: [],
+      });
       const result = await firstValueFrom(store.getServerStatuses());
 
       expect(result).toStrictEqual([
-        { ...dummyStatuses[0], online: 0, players: [] },
+        {
+          ...dummyStatuses[0],
+          online: 0,
+          players: [],
+        },
         dummyStatuses[1],
         dummyStatuses[2],
       ]);

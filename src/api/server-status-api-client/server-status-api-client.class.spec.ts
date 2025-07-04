@@ -27,9 +27,7 @@ describe('ServerStatusApiClient', () => {
       );
       ServerStatusApiClient.clearCache();
 
-      const result = await firstValueFrom(
-        apiClient.getPlayers('example.com'),
-      );
+      const result = await firstValueFrom(apiClient.getPlayers('example.com'));
 
       expect(result).toEqual({
         success: true,
@@ -45,11 +43,11 @@ describe('ServerStatusApiClient', () => {
       );
       ServerStatusApiClient.clearCache();
 
-      const result = await firstValueFrom(
-        apiClient.getPlayers('example.com'),
-      );
+      const result = await firstValueFrom(apiClient.getPlayers('example.com'));
 
-      expect(result).toEqual({ success: false });
+      expect(result).toEqual({
+        success: false,
+      });
     });
   });
 
@@ -66,7 +64,10 @@ describe('ServerStatusApiClient', () => {
         apiClient.getPlayerCount('example.com'),
       );
 
-      expect(result).toEqual({ success: true, online: 3 });
+      expect(result).toEqual({
+        success: true,
+        online: 3,
+      });
     });
 
     it('should return unsuccessful response', async () => {
@@ -81,7 +82,9 @@ describe('ServerStatusApiClient', () => {
         apiClient.getPlayerCount('example.com'),
       );
 
-      expect(result).toEqual({ success: false });
+      expect(result).toEqual({
+        success: false,
+      });
     });
   });
 });

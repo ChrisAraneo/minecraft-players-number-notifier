@@ -17,8 +17,14 @@ describe('ProgramArguments', () => {
       const args = programArguments.load();
 
       expect(args).toStrictEqual([
-        { key: DISCORD_TOKEN, value: '01234543210' },
-        { key: RECIPIENTS, value: ['rec1', 'rec2', 'rec3'] },
+        {
+          key: DISCORD_TOKEN,
+          value: '01234543210',
+        },
+        {
+          key: RECIPIENTS,
+          value: ['rec1', 'rec2', 'rec3'],
+        },
       ]);
     });
   });
