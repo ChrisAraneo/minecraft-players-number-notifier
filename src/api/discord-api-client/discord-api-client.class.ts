@@ -112,10 +112,7 @@ export class DiscordApiClient {
         )
         .then(noop)
         .catch((error: unknown) => {
-          this.logger.error(
-            `Could not send message to ${name}`,
-            error,
-          );
+          this.logger.error(`Could not send message to ${name}`, error);
           void this.login();
         });
     });
