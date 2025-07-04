@@ -14,14 +14,26 @@ export default [
     ],
     tsconfigRootDir: import.meta.dirname,
   }),
-  {
-    files: ['**/*.ts'],
+    {
+    files: ['**/!(*.spec).{ts,js,mjs}'],
     rules: {
       '@typescript-eslint/max-params': 'off',
       'no-void': 'off',
       'no-await-in-loop': 'off',
       'unicorn/prefer-ternary': 'off',
       'unicorn/number-literal-case': 'off',
+      '@typescript-eslint/no-unsafe-type-assertion': 'warn',
+    },
+  },
+  {
+    files: ['**/*.spec.ts'],
+    rules: {
+      '@typescript-eslint/max-params': 'off',
+      'no-void': 'off',
+      'no-await-in-loop': 'off',
+      'unicorn/prefer-ternary': 'off',
+      'unicorn/number-literal-case': 'off',
+      '@typescript-eslint/no-unsafe-type-assertion': 'off',
     },
   },
 ];
