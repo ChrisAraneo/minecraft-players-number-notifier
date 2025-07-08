@@ -32,7 +32,11 @@ export class DiscordApiMessage {
   }
 
   private initializeId(): void {
-    const string = `${this.recipientId};${this.server};${this.playerCount};${this.playerNames(this.players)}`;
+    const string =
+      `${this.recipientId};${this.server};${this.playerCount};${this.playerNames(this.players)}`.replaceAll(
+        ' ',
+        '',
+      );
     const md5Hasher = crypto.createHmac('md5', 'notasecret');
 
     this.id = md5Hasher.update(string).digest('hex');
