@@ -1,4 +1,7 @@
-import { isEqual } from 'lodash';
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable max-statements */
+/* eslint-disable @typescript-eslint/unbound-method */
+import { isArray, isEmpty, isEqual } from 'lodash';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 
 import { Player } from '../models/player.interface';
@@ -7,15 +10,15 @@ import { ServerStatus } from '../models/server-status.interface';
 export class Store {
   private readonly store = new BehaviorSubject<ServerStatus[]>([]);
 
-  getServerStatuses(): Observable<ServerStatus[]> {
+  getServerStatuses(): Observable<ServerStatus[] | null> {
     return this.store.asObservable();
   }
 
   getServerStatus(server: string): Observable<ServerStatus | null> {
     return this.store.asObservable().pipe(
       map((statuses) => statuses.filter((item) => item.server === server)),
-      map((item) => (Array.isArray(item) ? item[0] : item)),
-      map((item) => item || null),
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      map((item) => (isArray(item) ? item[0] : item) || null),
     );
   }
 
@@ -56,9 +59,14 @@ export class Store {
       return true;
     }
 
-    if (Boolean(current.players) && Boolean(previous.players)) {
+    if (
+      !isEmpty(current.players) &&
+      isArray(current.players) &&
+      !isEmpty(previous.players) &&
+      isArray(previous.players)
+    ) {
       const currentPlayers = [...current.players];
-      const previousPlayers = [...current.players];
+      const previousPlayers = [...previous.players];
 
       currentPlayers.sort(this.compareByUUID);
       previousPlayers.sort(this.compareByUUID);
