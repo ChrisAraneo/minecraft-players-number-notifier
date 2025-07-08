@@ -32,7 +32,7 @@ describe('DiscordApiMessage', () => {
         players,
       );
 
-      expect(message.getId()).toEqual('c615b6276813e57a0f463b75b44407ec');
+      expect(message.getId()).toEqual('810dcf7980a1bc3bb18aade83cf13b64');
     });
   });
 

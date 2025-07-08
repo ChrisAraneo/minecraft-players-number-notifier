@@ -78,11 +78,3 @@ export const DUMMY_RESPONSE: StatusResponse = {
   // eslint-disable-next-line camelcase
   eula_blocked: false,
 };
-
-export const mockSuccessFetch = (() => ({
-  json: (): StatusResponse => DUMMY_RESPONSE,
-})) as unknown as (url: any, init: any) => Promise<Response>;
-
-export const mockErrorFetch = (async (): Promise<unknown> => {
-  throw new Error('Error');
-}) as unknown as (url: any, init: any) => Promise<Response>;

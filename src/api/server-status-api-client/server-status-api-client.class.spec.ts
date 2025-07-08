@@ -6,9 +6,7 @@ import {
   DUMMY_CONFIG,
   DUMMY_RESPONSE,
   LoggerMock,
-  mockErrorFetch,
-  mockSuccessFetch,
-} from './server-status-api-client.class.data.spec';
+} from './server-status-api-client.class.spec.data';
 
 describe('ServerStatusApiClient', () => {
   let apiClient: ServerStatusApiClient;
@@ -23,7 +21,11 @@ describe('ServerStatusApiClient', () => {
       apiClient = new ServerStatusApiClient(
         DUMMY_CONFIG,
         logger,
-        mockSuccessFetch,
+        (url: string, init?: RequestInit | undefined) => {
+          return Promise.resolve({
+            json: () => Promise.resolve(DUMMY_RESPONSE),
+          }) as unknown as Promise<Response>;
+        },
       );
       ServerStatusApiClient.clearCache();
 
@@ -39,7 +41,9 @@ describe('ServerStatusApiClient', () => {
       apiClient = new ServerStatusApiClient(
         DUMMY_CONFIG,
         logger,
-        mockErrorFetch,
+        (async (): Promise<unknown> => {
+          throw new Error('Error');
+        }) as unknown as (url: any, init: any) => Promise<Response>,
       );
       ServerStatusApiClient.clearCache();
 
@@ -56,7 +60,11 @@ describe('ServerStatusApiClient', () => {
       apiClient = new ServerStatusApiClient(
         DUMMY_CONFIG,
         logger,
-        mockSuccessFetch,
+        (url: string, init?: RequestInit | undefined) => {
+          return Promise.resolve({
+            json: () => Promise.resolve(DUMMY_RESPONSE),
+          }) as unknown as Promise<Response>;
+        },
       );
       ServerStatusApiClient.clearCache();
 
@@ -74,7 +82,9 @@ describe('ServerStatusApiClient', () => {
       apiClient = new ServerStatusApiClient(
         DUMMY_CONFIG,
         logger,
-        mockErrorFetch,
+        (async (): Promise<unknown> => {
+          throw new Error('Error');
+        }) as unknown as (url: any, init: any) => Promise<Response>,
       );
       ServerStatusApiClient.clearCache();
 
