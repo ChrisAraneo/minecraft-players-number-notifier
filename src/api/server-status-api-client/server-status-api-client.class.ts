@@ -1,5 +1,5 @@
 import { Logger } from '@chris.araneo/logger';
-import { get, isArray, isNull, isNumber } from 'lodash';
+import { get, isArray, isNaN, isNull, isNumber } from 'lodash';
 import { from, map, Observable, of } from 'rxjs';
 
 import { Config } from '../../models/config.type';
@@ -37,7 +37,7 @@ export class ServerStatusApiClient {
       map((response) => {
         const players = get(response, 'players.list');
 
-        if (isArray(players)) {
+        if (players && isArray(players)) {
           return {
             success: true,
             players,
@@ -57,17 +57,17 @@ export class ServerStatusApiClient {
   ): Observable<NumberOfOnlinePlayersResult> {
     return this.getServerStatus(server, now).pipe(
       map((response) => {
-        const onlinePlayers = get(response, 'players.online');
+        const onlinePlayers = Number(get(response, 'players.online'));
 
-        if (isNumber(onlinePlayers)) {
+        if (isNaN(onlinePlayers)) {
           return {
-            success: true,
-            online: onlinePlayers,
+            success: false,
           };
         }
 
         return {
-          success: false,
+          success: true,
+          online: onlinePlayers,
         };
       }),
     );
@@ -81,21 +81,19 @@ export class ServerStatusApiClient {
 
     if (this.isCacheOutdated(cached, now)) {
       return from(
-        (async (): Promise<StatusResponse | null> => {
-          try {
-            const response = await this.fetchServerStatus(server);
-
+        this.fetchServerStatus(server)
+          .then((response) => {
             if (!isNull(response)) {
               this.updateCache(server, now, response);
             }
 
-            return response;
-          } catch {
-            this.logger.error(`Error while fetching server status`);
+            return response ?? null;
+          })
+          .catch(() => {
+            this.logger.error('Error while fetching server status');
 
             return null;
-          }
-        })(),
+          }),
       );
     }
 
@@ -110,17 +108,24 @@ export class ServerStatusApiClient {
     return of(cached?.response ?? null);
   }
 
-  private async fetchServerStatus(server: string): Promise<StatusResponse> {
+  private async fetchServerStatus(
+    server: string,
+  ): Promise<StatusResponse | null> {
     const url = `${ServerStatusApiClient.StatusEndpoint}/${server}`;
 
     this.logger.debug(`GET ${url}`);
 
     return this.fetch(url)
-      .then((response) => response.json() as unknown as StatusResponse)
+      .then((response) => response.json() as unknown)
       .then((json) => {
         this.logger.debug(`GET response`, json);
 
-        return json;
+        return (json ?? null) as StatusResponse | null;
+      })
+      .catch((error) => {
+        this.logger.error(`Error fetching server status for ${server}`, error);
+
+        return null;
       });
   }
 
