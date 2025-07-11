@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/unbound-method */
+
 import { isArray, isEmpty, isEqual } from 'lodash';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 
@@ -9,8 +10,10 @@ import { ServerStatus } from '../models/server-status.interface';
 export class Store {
   private readonly store = new BehaviorSubject<ServerStatus[]>([]);
 
-  getServerStatuses(): Observable<ServerStatus[] | null> {
-    return this.store.asObservable();
+  getServerStatuses(): Observable<ServerStatus[]> {
+    return this.store
+      .asObservable()
+      .pipe(map((statuses) => (isArray(statuses) ? statuses : [])));
   }
 
   getServerStatus(server: string): Observable<ServerStatus | null> {
