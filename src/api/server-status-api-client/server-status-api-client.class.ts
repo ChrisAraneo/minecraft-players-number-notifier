@@ -122,7 +122,7 @@ export class ServerStatusApiClient {
 
         return (json ?? null) as StatusResponse | null;
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         this.logger.error(`Error fetching server status for ${server}`, error);
 
         return null;

@@ -7,7 +7,7 @@ export class EnvironmentVariables {
 
   get(): Record<string, string | string[] | undefined> {
     const { env } = this.process;
-    const keys = Object.keys(env || {});
+    const keys = Object.keys(env);
     const result: Record<string, string | string[] | undefined> = {};
 
     for (const key of keys) {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+
 import { Player } from '../../models/player.interface';
 
 export interface StatusResponse {

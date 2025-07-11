@@ -21,11 +21,10 @@ describe('ServerStatusApiClient', () => {
       apiClient = new ServerStatusApiClient(
         DUMMY_CONFIG,
         logger,
-        (url: string, init?: RequestInit | undefined) => {
-          return Promise.resolve({
-            json: () => Promise.resolve(DUMMY_RESPONSE),
-          }) as unknown as Promise<Response>;
-        },
+        async (_url: string, _init?: RequestInit) =>
+          Promise.resolve({
+            json: async () => DUMMY_RESPONSE,
+          }) as unknown as Promise<Response>,
       );
       ServerStatusApiClient.clearCache();
 
@@ -60,11 +59,10 @@ describe('ServerStatusApiClient', () => {
       apiClient = new ServerStatusApiClient(
         DUMMY_CONFIG,
         logger,
-        (url: string, init?: RequestInit | undefined) => {
-          return Promise.resolve({
-            json: () => Promise.resolve(DUMMY_RESPONSE),
-          }) as unknown as Promise<Response>;
-        },
+        async (_url: string, _init?: RequestInit) =>
+          Promise.resolve({
+            json: async () => DUMMY_RESPONSE,
+          }) as unknown as Promise<Response>,
       );
       ServerStatusApiClient.clearCache();
 

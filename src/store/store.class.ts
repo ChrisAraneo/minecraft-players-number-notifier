@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-/* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/unbound-method */
 import { isArray, isEmpty, isEqual } from 'lodash';
 import { BehaviorSubject, map, Observable } from 'rxjs';
@@ -68,8 +67,8 @@ export class Store {
       const currentPlayers = [...current.players];
       const previousPlayers = [...previous.players];
 
-      currentPlayers.sort(this.compareByUUID);
-      previousPlayers.sort(this.compareByUUID);
+      currentPlayers.sort(this.compareByUuid);
+      previousPlayers.sort(this.compareByUuid);
 
       return !isEqual(currentPlayers, previousPlayers);
     }
@@ -81,7 +80,7 @@ export class Store {
     return a.server.localeCompare(b.server);
   }
 
-  private compareByUUID(a: Player, b: Player): number {
+  private compareByUuid(a: Player, b: Player): number {
     return a.uuid.localeCompare(b.uuid);
   }
 }

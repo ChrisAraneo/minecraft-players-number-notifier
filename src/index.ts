@@ -2,7 +2,7 @@ import { CurrentDirectory, FileSystem } from '@chris.araneo/file-system';
 import { HealthCheckService } from '@chris.araneo/health-check';
 import { Logger, LogLevel } from '@chris.araneo/logger';
 import dashify from 'dashify';
-import { get, isNull, isNumber, isUndefined } from 'lodash';
+import { get, isEmpty, isNull, isNumber, isUndefined } from 'lodash';
 import fetch from 'node-fetch-native';
 import {
   catchError,
@@ -37,9 +37,9 @@ import { Store } from './store/store.class';
 
   const configLoader = new ConfigLoader(currentDirectory, fileSystem);
   const config: Config | Record<string, never> =
-    (await firstValueFrom(configLoader.readConfigFile()).catch((error) =>
-      new Logger('error').error(error),
-    )) || {};
+    (await firstValueFrom(configLoader.readConfigFile()).catch((error: unknown) =>
+      new Logger('error').error(String(error)),
+    )) ?? {};
 
   const environmentVariables = new EnvironmentVariables(process).get();
 
@@ -53,7 +53,7 @@ import { Store } from './store/store.class';
     }
   }
 
-  if (Object.keys(config).length === 0) {
+  if (isEmpty(Object.keys(config))) {
     new Logger('error').error('No config');
     return;
   }

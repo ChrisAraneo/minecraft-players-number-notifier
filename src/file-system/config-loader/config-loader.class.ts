@@ -6,7 +6,7 @@ import {
   JsonFile,
   JsonFileReader,
 } from '@chris.araneo/file-system';
-import { catchError, map, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { Config } from '../../models/config.type';
 import {
@@ -29,8 +29,11 @@ export class ConfigLoader {
     const path = Path.normalize(`${currentDirectory}/dist/src/config.json`);
 
     return this.jsonFileReader.readFile(path).pipe(
-      map((result: unknown) => (result as JsonFile)?.getContent()),
-      catchError(() => {
+      map((result: unknown) => {
+        if (result instanceof JsonFile) {
+          return result.getContent();
+        }
+        
         throw new Error(CONFIG_READING_ERROR_MESSAGE);
       }),
       map((content: unknown) => {

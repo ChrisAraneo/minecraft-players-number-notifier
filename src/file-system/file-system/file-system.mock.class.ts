@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
+
 import {
   MakeDirectoryOptions,
   NoParamCallback,
@@ -74,9 +78,9 @@ export class FileSystemMock extends FileSystem {
   }
 
   override async writeFile(
-    file: PathOrFileDescriptor,
-    data: string | NodeJS.ArrayBufferView,
-    options: WriteFileOptions,
+    _file: PathOrFileDescriptor,
+    _data: string | NodeJS.ArrayBufferView,
+    _options: WriteFileOptions,
     callback: NoParamCallback,
   ): Promise<void> {
     callback(null);
@@ -88,7 +92,7 @@ export class FileSystemMock extends FileSystem {
 
   override mkdirSync(
     path: PathLike,
-    options?: MakeDirectoryOptions & {
+    _options?: MakeDirectoryOptions & {
       recursive: true;
     },
     callback?: (err: NodeJS.ErrnoException | null, path?: string) => void,
