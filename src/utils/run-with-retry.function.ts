@@ -6,7 +6,7 @@ export const runWithRetry = async <T>(
 ): Promise<T> => {
   try {
     return await fn();
-  } catch(error: unknown) {
+  } catch (error: unknown) {
     if (isFunction(errorFn)) {
       errorFn(error);
     }
