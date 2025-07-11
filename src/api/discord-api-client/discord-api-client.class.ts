@@ -48,16 +48,7 @@ export class DiscordApiClient {
   ): Promise<void> {
     await Promise.all(
       this.recipientIds.map(async (id) => {
-        let user: User | undefined;
-
-        while (!user) {
-          try {
-            user = await this.client.users.fetch(id);
-          } catch {
-            this.logger.error(`Could not fetch user with ID ${id}`);
-            void this.login();
-          }
-        }
+        const user: User = await this.fetchUserUntilSuccess(id);
 
         this.addPendingMessage(
           new DiscordApiMessage(user.id, server, playerCount, players),
@@ -179,20 +170,20 @@ export class DiscordApiClient {
   }
 
   private async fetchUserUntilSuccess(userId: string): Promise<User> {
-    const f = async (): Promise<User> => {
-      let user: User | undefined;
+    return this.fetchUserWithRetry(userId);
+  }
 
-      try {
-        user = await this.client.users.fetch(userId);
-      } catch {
-        this.logger.error(`Could not fetch user with ID ${userId}`);
-        void this.login();
-      }
+  private async fetchUserWithRetry(userId: string): Promise<User> {
+    let user: User | undefined;
 
-      return user ?? (await f());
-    };
+    try {
+      user = await this.client.users.fetch(userId);
+    } catch {
+      this.logger.error(`Could not fetch user with ID ${userId}`);
+      void this.login();
+    }
 
-    return f();
+    return user ?? (await this.fetchUserWithRetry(userId));
   }
 
   private async sendMessageUntilSuccess(
@@ -201,22 +192,25 @@ export class DiscordApiClient {
   ): Promise<void> {
     this.logger.info(`Sending message ${message.getId()} to user: ${user.id}`);
 
-    const f = async (): Promise<void> => {
-      try {
-        await user.send(message.getMessage());
-      } catch {
-        this.logger.error(
-          `Error while sending message ${message.getId()} to user: ${user.id}. Trying again.`,
-        );
-
-        await f();
-      }
-    };
-
-    await f();
+    await this.sendMessageWithRetry(user, message);
 
     this.logger.info(
       `Message ${message.getId()} successfully sent to user: ${user.id}`,
     );
+  }
+
+  private async sendMessageWithRetry(
+    user: User,
+    message: DiscordApiMessage,
+  ): Promise<void> {
+    try {
+      await user.send(message.getMessage());
+    } catch (error) {
+      this.logger.error(
+        `Error while sending message ${message.getId()} to user: ${user.id}. Trying again.`,
+        error,
+      );
+      await this.sendMessageWithRetry(user, message);
+    }
   }
 }
