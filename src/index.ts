@@ -37,8 +37,8 @@ import { Store } from './store/store.class';
 
   const configLoader = new ConfigLoader(currentDirectory, fileSystem);
   const config: Config | Record<string, never> =
-    (await firstValueFrom(configLoader.readConfigFile()).catch((error: unknown) =>
-      new Logger('error').error(String(error)),
+    (await firstValueFrom(configLoader.readConfigFile()).catch(
+      (error: unknown) => new Logger('error').error(String(error)),
     )) ?? {};
 
   const environmentVariables = new EnvironmentVariables(process).get();
