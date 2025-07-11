@@ -1,3 +1,6 @@
+/* eslint-disable no-undefined */
+/* eslint-disable @typescript-eslint/no-unsafe-type-assertion */
+
 import { FileSystemMock } from './file-system.mock.class';
 
 export class EmptyConfigFileSystemMock extends FileSystemMock {
