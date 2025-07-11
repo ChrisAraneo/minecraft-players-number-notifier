@@ -1,6 +1,6 @@
 import { Logger } from '@chris.araneo/logger';
 import { Client, Events, Partials, User } from 'discord.js';
-import { noop } from 'lodash';
+import { isEmpty, noop } from 'lodash';
 import { BehaviorSubject, debounceTime, Subscription } from 'rxjs';
 
 import { Config } from '../../models/config.type';
@@ -63,6 +63,7 @@ export class DiscordApiClient {
       partials: [Partials.User, Partials.Channel, Partials.Reaction],
       intents: ['Guilds', 'GuildMessages'],
     });
+    this.logger.info(`Client initialized.`);
   }
 
   private async login(): Promise<void> {
@@ -110,9 +111,17 @@ export class DiscordApiClient {
   }
 
   private addRecipients(ids: string[]): void {
+    if (isEmpty(ids)) {
+      return;
+    }
+
+    this.logger.info(`Adding recipients.`);
+
     for (const id of ids) {
       this.addRecipient(id);
     }
+
+    this.logger.info(`All recipients added.`);
   }
 
   private addRecipient(id: string): void {
