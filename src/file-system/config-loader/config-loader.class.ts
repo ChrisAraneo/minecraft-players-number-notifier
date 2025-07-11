@@ -33,7 +33,7 @@ export class ConfigLoader {
         if (result instanceof JsonFile) {
           return result.getContent();
         }
-        
+
         throw new Error(CONFIG_READING_ERROR_MESSAGE);
       }),
       map((content: unknown) => {
