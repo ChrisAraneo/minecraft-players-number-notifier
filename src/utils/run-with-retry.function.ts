@@ -2,13 +2,13 @@ import { isFunction } from 'lodash';
 
 export const runWithRetry = async <T>(
   fn: () => Promise<T>,
-  errorFn?: () => void,
+  errorFn?: (error: unknown) => void,
 ): Promise<T> => {
   try {
     return await fn();
-  } catch {
+  } catch(error: unknown) {
     if (isFunction(errorFn)) {
-      errorFn();
+      errorFn(error);
     }
   }
 
