@@ -1,11 +1,12 @@
 import { Logger } from '@chris.araneo/logger';
-import { Client, Events, Partials, User } from 'discord.js';
+import { Client, Events, Message, Partials, User } from 'discord.js';
 import { isEmpty, noop } from 'lodash';
 import { BehaviorSubject, debounceTime, Subscription } from 'rxjs';
 
 import { Config } from '../../models/config.type';
 import { Player } from '../../models/player.interface';
 import { THUMBS_UP_EMOJI, WAVING_HAND_EMOJI } from '../../utils/emoji.consts';
+import { runWithRetry } from '../../utils/run-with-retry.function';
 import { DiscordApiMessage } from '../discord-api-message/discord-api-message.class';
 import { MESSAGE_TO_SEND_DEBOUNCE_TIME } from './discord-api-client.consts';
 
@@ -179,20 +180,15 @@ export class DiscordApiClient {
   }
 
   private async fetchUserUntilSuccess(userId: string): Promise<User> {
-    return this.fetchUserWithRetry(userId);
-  }
+    const fetchUser = async (): Promise<User> =>
+      this.client.users.fetch(userId);
 
-  private async fetchUserWithRetry(userId: string): Promise<User> {
-    let user: User | undefined;
-
-    try {
-      user = await this.client.users.fetch(userId);
-    } catch {
-      this.logger.error(`Could not fetch user with ID ${userId}`);
+    const handleError = (error: unknown): void => {
+      this.logger.error(`Could not fetch user with ID ${userId}`, error);
       void this.login();
-    }
+    };
 
-    return user ?? (await this.fetchUserWithRetry(userId));
+    return runWithRetry(fetchUser, handleError);
   }
 
   private async sendMessageUntilSuccess(
@@ -201,25 +197,20 @@ export class DiscordApiClient {
   ): Promise<void> {
     this.logger.info(`Sending message ${message.getId()} to user: ${user.id}`);
 
-    await this.sendMessageWithRetry(user, message);
+    const sendMessage = async (): Promise<Message<false>> =>
+      user.send(message.getMessage());
 
-    this.logger.info(
-      `Message ${message.getId()} successfully sent to user: ${user.id}`,
-    );
-  }
-
-  private async sendMessageWithRetry(
-    user: User,
-    message: DiscordApiMessage,
-  ): Promise<void> {
-    try {
-      await user.send(message.getMessage());
-    } catch (error) {
+    const logError = (error: unknown): void => {
       this.logger.error(
         `Error while sending message ${message.getId()} to user: ${user.id}. Trying again.`,
         error,
       );
-      await this.sendMessageWithRetry(user, message);
-    }
+    };
+
+    await runWithRetry(sendMessage, logError);
+
+    this.logger.info(
+      `Message ${message.getId()} successfully sent to user: ${user.id}`,
+    );
   }
 }
