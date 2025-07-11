@@ -4,7 +4,5 @@
   "interval": 60000,
   "log-level": "debug",
   "recipients": [],
-  "servers": [
-    "org.earthmc.net"
-  ]
+  "servers": ["org.earthmc.net"]
 }
