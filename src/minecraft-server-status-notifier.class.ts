@@ -69,7 +69,7 @@ export class MinecraftServerStatusNotifier {
 
     this.startHealthCheckService(environmentVariables);
     this.startPollingServers();
-    this.subscribeToServerStatusesChanges();
+    this.startSendingNotificationsOnServerStatusesChanges();
   }
 
   private async loadConfiguration(): Promise<void> {
@@ -186,7 +186,7 @@ export class MinecraftServerStatusNotifier {
       .subscribe();
   }
 
-  private subscribeToServerStatusesChanges(): void {
+  private startSendingNotificationsOnServerStatusesChanges(): void {
     this.store
       .getServerStatuses()
       .pipe(
