@@ -47,15 +47,17 @@ export class MinecraftServerStatusNotifier {
   private process!: Process;
   private logger!: Logger;
   private config!: Config;
+  private environmentVariables: Record<string, string | string[] | undefined> =
+    {};
   private discordApiClient: DiscordApiClient | null = null;
   private apiClient!: ServerStatusApiClient;
 
   async initialize(): Promise<void> {
     await this.loadConfiguration();
 
-    const environmentVariables = this.loadEnvironmentVariables();
+    this.environmentVariables = this.loadEnvironmentVariables();
 
-    if (environmentVariables.CI) {
+    if (this.environmentVariables.CI) {
       return;
     }
 
@@ -66,8 +68,14 @@ export class MinecraftServerStatusNotifier {
     this.initializeLogger();
     this.initializeDiscordClient();
     this.initializeApiClient();
+  }
 
-    this.startHealthCheckService(environmentVariables);
+  run(): void {
+    if (this.environmentVariables.CI) {
+      return;
+    }
+
+    this.startHealthCheckService(this.environmentVariables);
     this.startPollingServers();
     this.startSendingNotificationsOnServerStatusesChanges();
   }
