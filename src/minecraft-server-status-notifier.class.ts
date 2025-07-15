@@ -109,7 +109,7 @@ export class MinecraftServerStatusNotifier {
     isLogLevelOrThrow(logLevel);
 
     this.logger = new Logger(logLevel);
-    this.logger.info('Minecraft Players Number Notifier v0.5.3');
+    this.logger.info('Minecraft Server Status Notifier v0.5.4');
     this.logger.debug(`Loaded configuration: ${JSON.stringify(this.config)}`);
   }
 

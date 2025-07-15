@@ -5,7 +5,7 @@ export class ProcessMock extends Process {
   override get argv(): string[] {
     return [
       `C:\\nodejs\\node.exe`,
-      `C:\\minecraft-players-number-notifier\\dist\\mpnn.js`,
+      `C:\\minecraft-server-status-notifier\\dist\\mpnn.js`,
       `${DISCORD_TOKEN}=01234543210`,
       `${RECIPIENTS}=rec1;rec2;rec3`,
     ];

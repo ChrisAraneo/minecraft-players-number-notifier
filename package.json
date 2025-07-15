@@ -1,7 +1,7 @@
 {
-  "name": "minecraft-players-number-notifier",
+  "name": "minecraft-server-status-notifier",
   "version": "0.5.4",
-  "description": "Script that checks number of players on Minecraft server and notifies the admin",
+  "description": "Script that checks players on Minecraft server and notifies the admin",
   "keywords": [
     "minecraft",
     "notifications",
@@ -9,13 +9,13 @@
     "discord",
     "discord-api"
   ],
-  "homepage": "https://github.com/ChrisAraneo/minecraft-players-number-notifier#readme",
+  "homepage": "https://github.com/ChrisAraneo/minecraft-server-status-notifier#readme",
   "bugs": {
-    "url": "https://github.com/ChrisAraneo/minecraft-players-number-notifier/issues"
+    "url": "https://github.com/ChrisAraneo/minecraft-server-status-notifier/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ChrisAraneo/minecraft-players-number-notifier.git"
+    "url": "git+https://github.com/ChrisAraneo/minecraft-server-status-notifier.git"
   },
   "license": "MIT",
   "author": "Krzysztof Pająk (Chris Araneo)",

@@ -1,11 +1,11 @@
-<h1 align="center">⛏️ Minecraft Players Number Notifier</h1>
+<h1 align="center">⛏️ Minecraft Server Status Notifier</h1>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/ChrisAraneo/minecraft-players-number-notifier/refs/heads/master/logo.png" alt="Minecraft Players Number Notifier logo" width="506px" height="144px"/>
+  <img src="https://raw.githubusercontent.com/ChrisAraneo/minecraft-server-status-notifier/refs/heads/master/logo.png" alt="Minecraft Server Status Notifier logo" width="506px" height="144px"/>
   <br>
-  <a href="https://github.com/ChrisAraneo/minecraft-players-number-notifier/blob/master/package.json"><img src="https://img.shields.io/badge/version-v0.5.3-blue" alt="version"></a>
-  <a href="https://github.com/ChrisAraneo/minecraft-players-number-notifier/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Minecraft Players Number Notifier is released under the MIT license."></a>
-  <a href="https://github.com/ChrisAraneo/minecraft-players-number-notifier/actions/workflows/node.js.yml"><img alt="GitHub CI Status" src="https://img.shields.io/github/actions/workflow/status/ChrisAraneo/minecraft-players-number-notifier/node.js.yml?label=CI&logo=GitHub"></a>
+  <a href="https://github.com/ChrisAraneo/minecraft-server-status-notifier/blob/master/package.json"><img src="https://img.shields.io/badge/version-v0.5.3-blue" alt="version"></a>
+  <a href="https://github.com/ChrisAraneo/minecraft-server-status-notifier/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Minecraft Server Status Notifier is released under the MIT license."></a>
+  <a href="https://github.com/ChrisAraneo/minecraft-server-status-notifier/actions/workflows/node.js.yml"><img alt="GitHub CI Status" src="https://img.shields.io/github/actions/workflow/status/ChrisAraneo/minecraft-server-status-notifier/node.js.yml?label=CI&logo=GitHub"></a>
   <br>
   <br>
   <em>Get notified on Discord when someone joins your Minecraft server</em>
@@ -71,12 +71,12 @@ DISCORD_TOKEN=YOURTOKENHERE npm run start
 
 ```bash
 # Build image
-docker build --build-arg DISCORD_TOKEN="YOURTOKENHERE" -t mpnn .
+docker build --build-arg DISCORD_TOKEN="YOURTOKENHERE" -t mssn .
 ```
 
 ```bash
 # Create and run container
-docker run mpnn
+docker run mssn
 ```
 
 Warning: current version of Dockerfile will store your Discord token in image. Be careful and don't leak your token.
