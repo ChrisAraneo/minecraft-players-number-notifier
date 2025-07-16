@@ -1,6 +1,6 @@
 import { Player } from '../../models/player.interface';
 
-export interface PlayersListResult {
+export interface PlayersListRequestResult {
   success: boolean;
   players?: Player[];
 }

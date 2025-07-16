@@ -28,8 +28,8 @@ import {
 } from 'rxjs';
 
 import { DiscordApiClient } from './api/discord-api-client/discord-api-client.class';
-import { NumberOfOnlinePlayersResult } from './api/interfaces/number-of-online-players-result.interface';
-import { PlayersListResult } from './api/interfaces/players-list-result.interface';
+import { PlayerCountRequestResult } from './api/interfaces/player-count-request-result.interface';
+import { PlayersListRequestResult } from './api/interfaces/players-list-request-result.interface';
 import { ServerStatusApiClient } from './api/server-status-api-client/server-status-api-client.class';
 import { ConfigLoader } from './file-system/config-loader/config-loader.class';
 import { Config } from './models/config.type';
@@ -212,10 +212,10 @@ export class MinecraftServerStatusNotifier {
   private logNumberOfPlayers(
     server: string,
   ): OperatorFunction<
-    NumberOfOnlinePlayersResult,
-    NumberOfOnlinePlayersResult
+    PlayerCountRequestResult,
+    PlayerCountRequestResult
   > {
-    return tap((result: NumberOfOnlinePlayersResult) => {
+    return tap((result: PlayerCountRequestResult) => {
       if (!isNumber(result.online)) {
         this.logger.info(
           `Could not read number of players on server ${server}.`,
@@ -233,10 +233,10 @@ export class MinecraftServerStatusNotifier {
   }
 
   private logPlayerNames(
-    getListOfPlayerNames: Observable<PlayersListResult>,
+    getListOfPlayerNames: Observable<PlayersListRequestResult>,
     server: string,
-  ): OperatorFunction<NumberOfOnlinePlayersResult, Player[]> {
-    return mergeMap((onlineResult: NumberOfOnlinePlayersResult) =>
+  ): OperatorFunction<PlayerCountRequestResult, Player[]> {
+    return mergeMap((onlineResult: PlayerCountRequestResult) =>
       getListOfPlayerNames.pipe(
         tap((playersResult) => {
           if (playersResult.success && !isEmpty(playersResult.players)) {
@@ -251,7 +251,7 @@ export class MinecraftServerStatusNotifier {
             );
           }
         }),
-        tap((result: PlayersListResult) => {
+        tap((result: PlayersListRequestResult) => {
           this.store.updateServerStatus({
             server,
             online: get(onlineResult, 'online', 0),

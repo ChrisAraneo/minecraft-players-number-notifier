@@ -4,9 +4,9 @@ import { from, map, Observable, of } from 'rxjs';
 
 import { Config } from '../../models/config.type';
 import { Cache } from '../interfaces/cache.interface';
-import { NumberOfOnlinePlayersResult } from '../interfaces/number-of-online-players-result.interface';
-import { PlayersListResult } from '../interfaces/players-list-result.interface';
+import { PlayerCountRequestResult } from '../interfaces/player-count-request-result.interface';
 import { StatusResponse } from '../interfaces/status-response.interface';
+import { PlayersListRequestResult } from '../interfaces/players-list-request-result.interface';
 
 export class ServerStatusApiClient {
   private static readonly StatusEndpoint = `https://api.mcsrvstat.us/3`;
@@ -32,7 +32,7 @@ export class ServerStatusApiClient {
   getPlayers(
     server: string,
     now: Date = new Date(),
-  ): Observable<PlayersListResult> {
+  ): Observable<PlayersListRequestResult> {
     return this.getServerStatus(server, now).pipe(
       map((response) => {
         const players = get(response, 'players.list');
@@ -54,7 +54,7 @@ export class ServerStatusApiClient {
   getPlayerCount(
     server: string,
     now: Date = new Date(),
-  ): Observable<NumberOfOnlinePlayersResult> {
+  ): Observable<PlayerCountRequestResult> {
     return this.getServerStatus(server, now).pipe(
       map((response) => {
         const onlinePlayers = Number(get(response, 'players.online'));
