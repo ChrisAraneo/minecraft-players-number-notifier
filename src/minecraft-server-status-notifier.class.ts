@@ -211,10 +211,7 @@ export class MinecraftServerStatusNotifier {
 
   private logNumberOfPlayers(
     server: string,
-  ): OperatorFunction<
-    PlayerCountRequestResult,
-    PlayerCountRequestResult
-  > {
+  ): OperatorFunction<PlayerCountRequestResult, PlayerCountRequestResult> {
     return tap((result: PlayerCountRequestResult) => {
       if (!isNumber(result.online)) {
         this.logger.info(

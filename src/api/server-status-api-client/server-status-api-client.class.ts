@@ -5,8 +5,8 @@ import { from, map, Observable, of } from 'rxjs';
 import { Config } from '../../models/config.type';
 import { Cache } from '../interfaces/cache.interface';
 import { PlayerCountRequestResult } from '../interfaces/player-count-request-result.interface';
-import { StatusResponse } from '../interfaces/status-response.interface';
 import { PlayersListRequestResult } from '../interfaces/players-list-request-result.interface';
+import { StatusResponse } from '../interfaces/status-response.interface';
 
 export class ServerStatusApiClient {
   private static readonly StatusEndpoint = `https://api.mcsrvstat.us/3`;
