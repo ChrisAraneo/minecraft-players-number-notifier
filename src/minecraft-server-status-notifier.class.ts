@@ -75,9 +75,28 @@ export class MinecraftServerStatusNotifier {
       return;
     }
 
-    this.startHealthCheckService(this.environmentVariables);
     this.startPollingServers();
     this.startSendingNotificationsOnServerStatusesChanges();
+  }
+
+  startHealthCheckService(
+    environmentVariables: Record<string, unknown>,
+  ): void {
+    if (this.environmentVariables.CI) {
+      return;
+    }
+
+    if (environmentVariables.MPNN_HEALTH_CHECK_PORT) {
+      void new HealthCheckService(
+        '/health',
+        Number(environmentVariables.MPNN_HEALTH_CHECK_PORT),
+        this.logger,
+      ).listen();
+    } else {
+      this.logger.error(
+        'MPNN_HEALTH_CHECK_PORT environment variable is not set. Health check service will not be started.',
+      );
+    }
   }
 
   private async loadConfiguration(): Promise<void> {
@@ -144,26 +163,16 @@ export class MinecraftServerStatusNotifier {
     this.discordApiClient =
       this.config.discord && !isNull(token)
         ? new DiscordApiClient(
-            this.config,
-            this.logger,
-            isArray(predefinedRecipients)
-              ? [...predefinedRecipients]
-              : [String(predefinedRecipients)],
-          )
+          this.config,
+          this.logger,
+          isArray(predefinedRecipients)
+            ? [...predefinedRecipients]
+            : [String(predefinedRecipients)],
+        )
         : null;
   }
 
-  private startHealthCheckService(
-    environmentVariables: Record<string, unknown>,
-  ): void {
-    if (environmentVariables.MPNN_HEALTH_CHECK_PORT) {
-      void new HealthCheckService(
-        '/health',
-        Number(environmentVariables.MPNN_HEALTH_CHECK_PORT),
-        this.logger,
-      ).listen();
-    }
-  }
+
 
   private startPollingServers(): void {
     const servers = this.config.servers || [];
