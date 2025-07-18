@@ -2,11 +2,11 @@ import crypto from 'node:crypto';
 
 import { Player } from '../../models/player.interface';
 import { MAN_WALKING_EMOJI } from '../../utils/emoji.consts';
-import { isOne } from '../../utils/is-one.function';
-import { isZero } from '../../utils/is-zero.function';
 
 export class DiscordApiMessage {
   private id!: string;
+  private hasNoPlayers!: boolean;
+  private hasOnePlayer!: boolean;
   private message!: string;
 
   constructor(
@@ -16,6 +16,7 @@ export class DiscordApiMessage {
     private readonly players: Player[],
   ) {
     this.initializeId();
+    this.initializePlayerCountFlags();
     this.initializeMessage();
   }
 
@@ -42,10 +43,17 @@ export class DiscordApiMessage {
     this.id = md5Hasher.update(string).digest('hex');
   }
 
+  private initializePlayerCountFlags(): void {
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    this.hasNoPlayers = this.playerCount === 0;
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    this.hasOnePlayer = this.playerCount === 1;
+  }
+
   private initializeMessage(): void {
-    if (isZero(this.playerCount)) {
+    if (this.hasNoPlayers) {
       this.message = `No players on server ${this.server}`;
-    } else if (isOne(this.playerCount)) {
+    } else if (this.hasOnePlayer) {
       this.message = `${this.playerCount} player ${MAN_WALKING_EMOJI} on server ${this.server}: ${this.playerNames(this.players)}`;
     } else {
       this.message = `${this.playerCount} players ${MAN_WALKING_EMOJI} on server ${this.server}: ${this.playerNames(this.players)}`;
