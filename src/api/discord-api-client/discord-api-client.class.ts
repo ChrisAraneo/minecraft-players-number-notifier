@@ -77,7 +77,11 @@ export class DiscordApiClient {
           resolve();
         });
       } catch (error: unknown) {
-        reject(error as Error);
+        if (error instanceof Error) {
+          reject(error);
+        } else {
+          reject(new Error(JSON.stringify(error)));
+        }
       }
     }).catch(() => {
       this.logger.error('Could not login. Trying again.');
