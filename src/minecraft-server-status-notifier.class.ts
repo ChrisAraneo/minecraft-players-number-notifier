@@ -79,9 +79,7 @@ export class MinecraftServerStatusNotifier {
     this.startSendingNotificationsOnServerStatusesChanges();
   }
 
-  startHealthCheckService(
-    environmentVariables: Record<string, unknown>,
-  ): void {
+  startHealthCheckService(environmentVariables: Record<string, unknown>): void {
     if (this.environmentVariables.CI) {
       return;
     }
@@ -163,16 +161,14 @@ export class MinecraftServerStatusNotifier {
     this.discordApiClient =
       this.config.discord && !isNull(token)
         ? new DiscordApiClient(
-          this.config,
-          this.logger,
-          isArray(predefinedRecipients)
-            ? [...predefinedRecipients]
-            : [String(predefinedRecipients)],
-        )
+            this.config,
+            this.logger,
+            isArray(predefinedRecipients)
+              ? [...predefinedRecipients]
+              : [String(predefinedRecipients)],
+          )
         : null;
   }
-
-
 
   private startPollingServers(): void {
     const servers = this.config.servers || [];
