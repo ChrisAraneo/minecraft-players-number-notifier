@@ -12,7 +12,7 @@ export class ServerStatusApiClient {
   private static readonly StatusEndpoint = `https://api.mcsrvstat.us/3`;
   private static Cache = new Map<string, Cache>();
 
-  private readonly CacheTTL: number;
+  private readonly cacheExpirationTime: number;
 
   constructor(
     private readonly config: Config,
@@ -22,7 +22,7 @@ export class ServerStatusApiClient {
       init?: RequestInit,
     ) => Promise<Response>,
   ) {
-    this.CacheTTL = Number(this.config['cache-ttl']);
+    this.cacheExpirationTime = Number(this.config['cache-ttl']);
   }
 
   static clearCache(): void {
@@ -136,7 +136,7 @@ export class ServerStatusApiClient {
   private isCacheOutdated(cached: Cache | undefined, now: Date): boolean {
     return (
       !cached?.timestamp ||
-      Number(cached.timestamp) + this.CacheTTL < Number(now)
+      Number(cached.timestamp) + this.cacheExpirationTime < Number(now)
     );
   }
 
