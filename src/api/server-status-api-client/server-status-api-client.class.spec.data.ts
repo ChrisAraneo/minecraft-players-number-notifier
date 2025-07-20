@@ -1,3 +1,6 @@
+/* eslint-disable camelcase */
+/* eslint-disable @typescript-eslint/naming-convention */
+
 import { Logger } from '@chris.araneo/logger';
 import { noop } from 'rxjs';
 
@@ -53,7 +56,6 @@ export const DUMMY_RESPONSE: StatusResponse = {
     apiversion: 0,
     dns: {
       srv: [],
-      // eslint-disable-next-line camelcase
       srv_a: [],
     },
   },
@@ -75,6 +77,5 @@ export const DUMMY_RESPONSE: StatusResponse = {
     clean: '',
     html: '',
   },
-  // eslint-disable-next-line camelcase
   eula_blocked: false,
 };
