@@ -6,6 +6,7 @@ import {
   JsonFile,
   JsonFileReader,
 } from '@chris.araneo/file-system';
+import { get } from 'lodash';
 import { map, Observable } from 'rxjs';
 
 import { Config } from '../../models/config.type';
@@ -50,20 +51,20 @@ export class ConfigLoader {
       return false;
     }
 
-    const validServers = this.isStringArray((object as Config).servers);
-    const validDiscord = typeof (object as Config).discord === 'boolean';
-    const validCacheTTL = typeof (object as Config)['cache-ttl'] === 'number';
-    const validInterval = typeof (object as Config).interval === 'number';
-    const validLogLevel = typeof (object as Config)['log-level'] === 'string';
-    const validRecipients = this.isStringArray((object as Config).recipients);
+    const isServersValid = this.isStringArray(get(object, 'servers'));
+    const isDiscordValid = typeof get(object, 'discord') === 'boolean';
+    const isCacheTtlValid = typeof get(object, 'cache-ttl') === 'number';
+    const isIntervalValid = typeof get(object, 'interval') === 'number';
+    const isLogLevelValid = typeof get(object, 'log-level') === 'string';
+    const isRecipientsValid = this.isStringArray(get(object, 'recipients'));
 
     return (
-      validServers &&
-      validDiscord &&
-      validCacheTTL &&
-      validInterval &&
-      validLogLevel &&
-      validRecipients
+      isServersValid &&
+      isDiscordValid &&
+      isCacheTtlValid &&
+      isIntervalValid &&
+      isLogLevelValid &&
+      isRecipientsValid
     );
   }
 
